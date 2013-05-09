@@ -27,7 +27,7 @@ package
 	import util.recorder.PatientRecorder;
 	
 	
-	[SWF(frameRate="60", backgroundColor="#DDDDDD", width="1000", height="600")]
+	[SWF(frameRate="60", backgroundColor="#DDDDDD", width="1000", height="1000")]
 	public class Main extends Sprite
 	{
 		// Defaults
@@ -36,6 +36,8 @@ package
 		public static const WindowHeight:uint = 600;
 		[Embed(source="../fonts/segoeui.ttf", embedAsCFF="false", fontName="SegoeUI")]
 		public static const FONT_MARKER:String;
+		// Edit this to change where the patient data is saved.
+		public static const filePath:String = "C:/Users/kinectpc/Patient Data/";
 		
 		// General Kinect Settings
 		private var settings:KinectSettings;
@@ -99,6 +101,7 @@ package
 				debugMessagesField = new TextField(); // Stores info details.
 				
 				deviceMessagesField = new TextField();
+				deviceMessagesField.wordWrap = true;
 				formatStatusLog(deviceMessagesField);
 				addChild(deviceMessagesField);
 				
@@ -115,7 +118,7 @@ package
 				header.addChild(k2status);
 				addChild(header);
 				// Sub Menu
-				subHeader = new SubHeader(WindowWidth, 30, "Please add the patient ID and Procedure prior to clicking 'Start'. You may add comments after the patient has done the procedure.");
+				subHeader = new SubHeader(WindowWidth, 30, "Please add the patient ID prior to clicking 'Start'. You must add the procedure/comments before clicking stop :).");
 				subHeader.x = 0;
 				subHeader.y = 60;
 				addChild(subHeader);
@@ -150,7 +153,7 @@ package
 				settings.rgbEnabled = true;
 				settings.rgbResolution = CameraResolution.RESOLUTION_160_120;
 				settings.depthEnabled = true;
-				settings.depthResolution = CameraResolution.RESOLUTION_160_120;
+				settings.depthResolution = CameraResolution.RESOLUTION_640_480;
 				settings.depthShowUserColors = false;
 				settings.skeletonEnabled = true;
 				settings.handTrackingEnabled = false;
@@ -167,32 +170,32 @@ package
 		}
 		
 		private function onDevice1Error(event:DeviceErrorEvent):void {
-			deviceMessagesField.text += "ERROR: Kinect 1 " + event.message + "\n";
+			deviceMessagesField.text = "ERROR: Kinect 1 " + event.message + "\n" + deviceMessagesField.text;
 			k1status.updateStatus(0xcb2300);
 		}
 		
 		private function onDevice2Error(event:DeviceErrorEvent):void {
-			deviceMessagesField.text += "ERROR: Kinect 2 " + event.message + "\n";
+			deviceMessagesField.text = "ERROR: Kinect 2 " + event.message + "\n" + deviceMessagesField.text;
 			k2status.updateStatus(0xcb2300);
 		}
 		
 		protected function kinect1StartedHandler(event:DeviceEvent):void {
-			deviceMessagesField.text += "Kinect 1 has been initialized.\n";
+			deviceMessagesField.text = "Kinect 1 has been initialized.\n" + deviceMessagesField.text;
 			k1status.updateStatus();
 		}
 		
 		protected function kinect2StartedHandler(event:DeviceEvent):void {
-			deviceMessagesField.text += "Kinect 2 has been initialized.\n";
+			deviceMessagesField.text = "Kinect 2 has been initialized.\n" + deviceMessagesField.text;
 			k2status.updateStatus();
 		}
 		
 		protected function kinect1StoppedHandler(event:DeviceEvent):void {
-			deviceMessagesField.text += "Kinect 1 has stopped [restart app].\n";
+			deviceMessagesField.text = "Kinect 1 has stopped [restart app].\n" + deviceMessagesField.text;
 			k1status.updateStatus(0xcb2300);
 		}
 		
 		protected function kinect2StoppedHandler(event:DeviceEvent):void {
-			deviceMessagesField.text += "Kinect 2 has stopped [restart app]\n";
+			deviceMessagesField.text = "Kinect 2 has stopped [restart app]\n" + deviceMessagesField.text;
 			k2status.updateStatus(0xcb2300);
 		}
 		
@@ -203,15 +206,18 @@ package
 				recorder2.stopRecording(form.getJSONString());
 				
 				// Report success, and clear fields for next patient.
-				deviceMessagesField.text += "Data for patient " + form.getPatientNumber() + " saved.\n";
+				deviceMessagesField.text = "Patient " + form.getPatientNumber() + " saved.\n" + deviceMessagesField.text;
 				form.clearFields();
 			}
-			else if (!recorder1.isRecording() && !recorder2.isRecording()) {
+			else if (!recorder1.isRecording() && !recorder2.isRecording() && form.getPatientNumber() != "") {
 				startButton.setText("Stop Recording");
-				exportDirectoryK1 = File.documentsDirectory.resolvePath(form.getPatientNumber() +  "/" + "Kinect1/");
-				exportDirectoryK2 = File.documentsDirectory.resolvePath(form.getPatientNumber() +  "/" + "Kinect2/");
+				exportDirectoryK1 = File.documentsDirectory.resolvePath(filePath + form.getPatientNumber() +  "/" + "Kinect1/");
+				exportDirectoryK2 = File.documentsDirectory.resolvePath(filePath + form.getPatientNumber() +  "/" + "Kinect2/");
 				recorder1.startRecording(device1, exportDirectoryK1);
 				recorder2.startRecording(device2, exportDirectoryK2);
+			}
+			else {
+				deviceMessagesField.text = "Please input patient number.\n" + deviceMessagesField.text;
 			}
 		}
 		
@@ -248,7 +254,7 @@ package
 		}
 		
 		/** Helper Function **/
-		// Should be its own class with more functionality (like add new status, etc).
+		// Should be its own class with more functionality (like add new status, etc). Also should have an addText with latest message first.
 		private function formatStatusLog(deviceMessagesField:TextField):void {
 			deviceMessagesField.embedFonts = true;
 			deviceMessagesField.defaultTextFormat = textFormat;
