@@ -18,19 +18,17 @@ package util.recorder
 		private var _isRecording:Boolean;
 		
 		private var _kinect:Kinect;
-		private var _recordingStartTime:int;
 		
-		private var _tempDirectory:File;
-		private var _tempSettingsFile:File;
-		private var _rgbTempDirectory:File;
-		private var _depthTempDirectory:File;
-		private var _userFrameTempDirectory:File;
+		private var _recordingStartTime:int;
 		
 		private var _exportDirectory:File;
 		private var _exportSettingsFile:File;
 		private var _exportRgbDirectory:File;
 		private var _exportDepthDirectory:File;
 		private var _exportUserFrameDirectory:File;
+		
+		private var patientNumber:String;
+		private var description:String;
 		
 		public function PatientRecorder() {
 		}
@@ -39,7 +37,7 @@ package util.recorder
 			return _isRecording;
 		}
 		
-		public function startRecording(kinect:Kinect):void {
+		public function startRecording(kinect:Kinect, exportDirectory:File):void {
 			if (!_isRecording) {
 				_isRecording = true;
 				
@@ -48,114 +46,67 @@ package util.recorder
 				_recordingStartTime = getTimer();
 				_kinect = kinect;
 				
-				_tempDirectory = File.createTempDirectory();
+				_exportDirectory = exportDirectory;
 				
-				trace("tmp dir", _tempDirectory.nativePath);
+				_exportDirectory.createDirectory();
 				
-				_tempSettingsFile = _tempDirectory.resolvePath("settings.json");
+				trace("Exporting to:", _exportDirectory.nativePath);
+				
+				_exportSettingsFile = _exportDirectory.resolvePath("kinect_settings.json");
 				var settingsFileStream:FileStream = new FileStream();
-				settingsFileStream.open(_tempSettingsFile, FileMode.WRITE);
+				settingsFileStream.open(_exportSettingsFile, FileMode.WRITE);
 				settingsFileStream.writeUTFBytes(JSON.stringify(_kinect.settings));
 				settingsFileStream.close();
 				
-				_rgbTempDirectory = _tempDirectory.resolvePath("rgb");
-				_rgbTempDirectory.createDirectory();
+				_exportRgbDirectory = _exportDirectory.resolvePath("rgb");
+				_exportRgbDirectory.createDirectory();
 				
-				_depthTempDirectory = _tempDirectory.resolvePath("depth");
-				_depthTempDirectory.createDirectory();
+				_exportDepthDirectory = _exportDirectory.resolvePath("depth");
+				_exportDepthDirectory.createDirectory();
 				
-				_userFrameTempDirectory = _tempDirectory.resolvePath("user");
-				_userFrameTempDirectory.createDirectory();
+				_exportUserFrameDirectory = _exportDirectory.resolvePath("user");
+				_exportUserFrameDirectory.createDirectory();
 				
-				_kinect.addEventListener(CameraImageEvent.RGB_IMAGE_UPDATE, rgbHandler, false, 0, true);
-				_kinect.addEventListener(CameraImageEvent.DEPTH_IMAGE_UPDATE, depthHandler, false, 0, true);
+				//_kinect.addEventListener(CameraImageEvent.RGB_IMAGE_UPDATE, rgbHandler, false, 0, true);
+				//_kinect.addEventListener(CameraImageEvent.DEPTH_IMAGE_UPDATE, depthHandler, false, 0, true);
 				_kinect.addEventListener(UserFrameEvent.USER_FRAME_UPDATE, userFrameUpdateHandler, false, 0, true);
 			}
 		}
 		
-		public function stopRecording():void {
+		public function stopRecording(otherData:String=""):void {
 			if (_isRecording) {
 				_isRecording = false;
 				if (_kinect) {
-					_kinect.removeEventListener(CameraImageEvent.RGB_IMAGE_UPDATE, rgbHandler, false);
-					_kinect.removeEventListener(CameraImageEvent.DEPTH_IMAGE_UPDATE, depthHandler, false);
+					//_kinect.removeEventListener(CameraImageEvent.RGB_IMAGE_UPDATE, rgbHandler, false);
+					//_kinect.removeEventListener(CameraImageEvent.DEPTH_IMAGE_UPDATE, depthHandler, false);
 					_kinect.removeEventListener(UserFrameEvent.USER_FRAME_UPDATE, userFrameUpdateHandler, false);
 				}
 				
-				//save the recording
-				askForExportLocation();
+				// save the other data.
+				
+				var _patientDetailsFile:File = _exportDirectory.resolvePath("patient_details.json");
+				var patientDetailsFileStream:FileStream = new FileStream();
+				var settingsFileStream:FileStream = new FileStream();
+				settingsFileStream.open(_patientDetailsFile, FileMode.WRITE);
+				settingsFileStream.writeUTFBytes(otherData);
+				settingsFileStream.close();
 			}
-		}
-		
-		private function askForExportLocation():void {
-			_exportDirectory = File.documentsDirectory;
-			_exportDirectory.addEventListener(Event.SELECT, exportDirectorySelectHandler, false, 0, true);
-			_exportDirectory.browseForDirectory("Where do you want to save the recording?");
-		}
-		
-		protected function exportDirectorySelectHandler(event:Event):void {
-			_exportDirectory.removeEventListener(Event.SELECT, exportDirectorySelectHandler, false);
-			saveToExportLocation();
-		}
-		
-		private function saveToExportLocation():void {
-			copySettings();
-			startAsyncRgbCopy();
 		}
 		
 		private function copySettings():void {
 			_exportSettingsFile = _exportDirectory.resolvePath("settings.json");
-			_tempSettingsFile.copyTo(_exportSettingsFile, true);
-		}
-		
-		private function startAsyncRgbCopy():void {
-			_exportRgbDirectory = _exportDirectory.resolvePath("rgb");
-			_rgbTempDirectory.addEventListener(Event.COMPLETE, asyncRgbCompleteHandler, false, 0, true);
-			_rgbTempDirectory.copyToAsync(_exportRgbDirectory, true);
-		}
-		
-		protected function asyncRgbCompleteHandler(event:Event):void {
-			_rgbTempDirectory.removeEventListener(Event.COMPLETE, asyncRgbCompleteHandler, false);
-			startAsyncDepthCopy();
-		}
-		
-		private function startAsyncDepthCopy():void {
-			_exportDepthDirectory = _exportDirectory.resolvePath("depth");
-			_depthTempDirectory.addEventListener(Event.COMPLETE, asyncDepthCompleteHandler, false, 0, true);
-			_depthTempDirectory.copyToAsync(_exportDepthDirectory, true);
-		}
-		
-		protected function asyncDepthCompleteHandler(event:Event):void {
-			_depthTempDirectory.removeEventListener(Event.COMPLETE, asyncDepthCompleteHandler, false);
-			startAsyncUserFrameCopy()
-		}
-		
-		private function startAsyncUserFrameCopy():void {
-			_exportUserFrameDirectory = _exportDirectory.resolvePath("user");
-			_userFrameTempDirectory.addEventListener(Event.COMPLETE, asyncUserFrameCompleteHandler, false, 0, true);
-			_userFrameTempDirectory.copyToAsync(_exportUserFrameDirectory, true);
-		}
-		
-		protected function asyncUserFrameCompleteHandler(event:Event):void {
-			_userFrameTempDirectory.removeEventListener(Event.COMPLETE, asyncUserFrameCompleteHandler, false);
-			removeTempDirectory();
-			trace("save complete");
-		}
-		
-		private function removeTempDirectory():void {
-			_tempDirectory.deleteDirectory(true);
 		}
 		
 		protected function rgbHandler(event:CameraImageEvent):void {
-			writeImageFrame(_rgbTempDirectory, event.imageData);
+			writeImageFrame(_exportRgbDirectory, event.imageData);
 		}
 		
 		protected function depthHandler(event:CameraImageEvent):void {
-			writeImageFrame(_depthTempDirectory, event.imageData);
+			writeImageFrame(_exportDepthDirectory, event.imageData);
 		}
 		
 		protected function userFrameUpdateHandler(event:UserFrameEvent):void {
-			writeUserFrame(_userFrameTempDirectory, event.userFrame);
+			writeUserFrame(_exportUserFrameDirectory, event.userFrame);
 		}
 		
 		private function writeImageFrame(frameDirectory:File, bmpData:BitmapData):void {

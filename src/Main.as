@@ -11,8 +11,12 @@ package
 	
 	import flash.display.Sprite;
 	import flash.events.Event;
+	import flash.events.MouseEvent;
+	import flash.filesystem.File;
 	import flash.text.TextField;
 	import flash.text.TextFormat;
+	import flash.ui.Mouse;
+	import flash.ui.MouseCursor;
 	
 	import ui.elements.Button;
 	import ui.elements.Header;
@@ -39,10 +43,12 @@ package
 		// Kinect 1 Properties
 		private var device1:Kinect;
 		private var depthSkeletonContainer1:Sprite;
+		private var exportDirectoryK1:File;
 		
 		// Kinect 2 Properties
 		private var device2:Kinect;
 		private var depthSkeletonContainer2:Sprite;
+		private var exportDirectoryK2:File;
 		
 		// Errors
 		public var deviceMessagesField:TextField;
@@ -61,6 +67,7 @@ package
 		
 		// Kinect Recorder
 		private var recorder1:PatientRecorder;
+		private var recorder2:PatientRecorder;
 		
 		public function Main() {
 			if (Kinect.isSupported()) {
@@ -70,6 +77,7 @@ package
 				
 				// Create the recorder
 				recorder1 = new PatientRecorder();
+				recorder2 = new PatientRecorder();
 				
 				// Create the UI components to display for Kinect 1.
 				depthSkeletonContainer1 = new Sprite();
@@ -117,10 +125,12 @@ package
 				form.y = 140;
 				addChild(form);
 				// Buttons
-				startButton = new Button(100,30, "Start Recording", 0x111111, 0xDDDDDD);
-				startButton.x = 50;
-				startButton.y = 300;
-				startButton.onClick(startRecordingHandler);
+				startButton = new Button(110,30, "Start Recording", 0x111111, 0xDDDDDD);
+				startButton.x = 450;
+				startButton.y = 380;
+				startButton.onClick(toggleRecordingHandler);
+				startButton.addEventListener(MouseEvent.ROLL_OVER, overHand);
+				startButton.addEventListener(MouseEvent.ROLL_OUT, outHand);
 				addChild(startButton);
 				
 				
@@ -138,12 +148,12 @@ package
 				
 				settings = new KinectSettings();
 				settings.rgbEnabled = true;
-				settings.rgbResolution = CameraResolution.RESOLUTION_640_480;
+				settings.rgbResolution = CameraResolution.RESOLUTION_160_120;
 				settings.depthEnabled = true;
-				settings.depthResolution = CameraResolution.RESOLUTION_640_480;
+				settings.depthResolution = CameraResolution.RESOLUTION_160_120;
 				settings.depthShowUserColors = false;
 				settings.skeletonEnabled = true;
-				settings.handTrackingEnabled = true;
+				settings.handTrackingEnabled = false;
 				
 				device1.start(settings);
 				device2.start(settings);
@@ -186,12 +196,22 @@ package
 			k2status.updateStatus(0xcb2300);
 		}
 		
-		protected function startRecordingHandler(event:Event):void {
-			if (recorder1.isRecording()) {
-				recorder1.stopRecording();
+		protected function toggleRecordingHandler(event:Event):void {
+			if (recorder1.isRecording() && recorder2.isRecording()) {
+				startButton.setText("Start Recording");
+				recorder1.stopRecording(form.getJSONString());
+				recorder2.stopRecording(form.getJSONString());
+				
+				// Report success, and clear fields for next patient.
+				deviceMessagesField.text += "Data for patient " + form.getPatientNumber() + " saved.\n";
+				form.clearFields();
 			}
-			else {
-				recorder1.startRecording(device1);
+			else if (!recorder1.isRecording() && !recorder2.isRecording()) {
+				startButton.setText("Stop Recording");
+				exportDirectoryK1 = File.documentsDirectory.resolvePath(form.getPatientNumber() +  "/" + "Kinect1/");
+				exportDirectoryK2 = File.documentsDirectory.resolvePath(form.getPatientNumber() +  "/" + "Kinect2/");
+				recorder1.startRecording(device1, exportDirectoryK1);
+				recorder2.startRecording(device2, exportDirectoryK2);
 			}
 		}
 		
@@ -217,6 +237,14 @@ package
 					}
 				}
 			}
+		}
+		
+		private function overHand(e:MouseEvent):void {
+			Mouse.cursor=MouseCursor.BUTTON;
+		}
+		
+		private function outHand(e:MouseEvent):void {
+			Mouse.cursor=MouseCursor.ARROW;
 		}
 		
 		/** Helper Function **/

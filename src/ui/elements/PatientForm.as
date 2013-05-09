@@ -102,5 +102,19 @@ package ui.elements
 			comments.defaultTextFormat = commentFormat;
 			addChild(comments);
 		}
+		
+		public function getJSONString():String {
+			return '{"id" : ' + idNumber.text + ', "procedure" : "' + procedure.text + '", "comments" : "' + comments.text + '"}';
+		}
+		
+		public function getPatientNumber():String {
+			return idNumber.text;	
+		}
+		
+		public function clearFields():void {
+			idNumber.text = "";
+			procedure.text = "";
+			comments.text = "";
+		}
 	}
 }
