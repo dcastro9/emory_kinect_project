@@ -33,7 +33,7 @@ package
 		// Defaults
 		public static const KinectMaxDepthInFlash:uint = 200;
 		public static const WindowWidth:uint = 1000;
-		public static const WindowHeight:uint = 600;
+		public static const WindowHeight:uint = 1000;
 		[Embed(source="../fonts/segoeui.ttf", embedAsCFF="false", fontName="SegoeUI")]
 		public static const FONT_MARKER:String;
 		// Edit this to change where the patient data is saved.
@@ -81,6 +81,12 @@ package
 				recorder1 = new PatientRecorder();
 				recorder2 = new PatientRecorder();
 				
+				// Add border to general sprite.
+				this.graphics.lineStyle(1, 0x000000);
+				this.graphics.beginFill(0x000000, 0);
+				this.graphics.drawRect(0, 0, WindowWidth, WindowHeight);
+				this.graphics.endFill();
+				
 				// Create the UI components to display for Kinect 1.
 				depthSkeletonContainer1 = new Sprite();
 				depthSkeletonContainer1.x = 0;
@@ -118,7 +124,7 @@ package
 				header.addChild(k2status);
 				addChild(header);
 				// Sub Menu
-				subHeader = new SubHeader(WindowWidth, 30, "Please add the patient ID prior to clicking 'Start'. You must add the procedure/comments before clicking stop :).");
+				subHeader = new SubHeader(WindowWidth, 30, "Please add the patient ID and procedure prior to clicking 'Start'. You must add the comments before clicking stop :).");
 				subHeader.x = 0;
 				subHeader.y = 60;
 				addChild(subHeader);
@@ -206,13 +212,16 @@ package
 				recorder2.stopRecording(form.getJSONString());
 				
 				// Report success, and clear fields for next patient.
-				deviceMessagesField.text = "Patient " + form.getPatientNumber() + " saved.\n" + deviceMessagesField.text;
-				form.clearFields();
+				deviceMessagesField.text = "Patient " + form.getPatientNumber() + " saved for procedure: " + form.getProcedure() + "\n" + deviceMessagesField.text;
+				form.clearFields();	
 			}
 			else if (!recorder1.isRecording() && !recorder2.isRecording() && form.getPatientNumber() != "") {
+				var date:Date = new Date();
 				startButton.setText("Stop Recording");
-				exportDirectoryK1 = File.documentsDirectory.resolvePath(filePath + form.getPatientNumber() +  "/" + "Kinect1/");
-				exportDirectoryK2 = File.documentsDirectory.resolvePath(filePath + form.getPatientNumber() +  "/" + "Kinect2/");
+				exportDirectoryK1 = File.documentsDirectory.resolvePath(filePath + form.getPatientNumber() + " - " + form.getProcedure()
+					+ " - " + date.toDateString() + " " + date.hours + "-" + date.minutes + "/" + "Kinect1/");
+				exportDirectoryK2 = File.documentsDirectory.resolvePath(filePath + form.getPatientNumber() + " - " + form.getProcedure()
+					+ " - " + date.toDateString() + " " + date.hours + "-" + date.minutes + "/" + "Kinect2/");
 				recorder1.startRecording(device1, exportDirectoryK1);
 				recorder2.startRecording(device2, exportDirectoryK2);
 			}
@@ -258,16 +267,16 @@ package
 		private function formatStatusLog(deviceMessagesField:TextField):void {
 			deviceMessagesField.embedFonts = true;
 			deviceMessagesField.defaultTextFormat = textFormat;
-			deviceMessagesField.width = 215;
-			deviceMessagesField.height = 508;
+			deviceMessagesField.width = 220;
+			deviceMessagesField.height = 908;
 			deviceMessagesField.background = true;
 			deviceMessagesField.backgroundColor = 0xEEEEEE;
 			deviceMessagesField.textColor = 0x222222;
 			deviceMessagesField.border = true;
 			deviceMessagesField.borderColor = 0x000000;
-			deviceMessagesField.x = WindowWidth - deviceMessagesField.width - 2;
+			deviceMessagesField.x = WindowWidth - deviceMessagesField.width;
 			deviceMessagesField.y = WindowHeight - deviceMessagesField.height - 2;
-			deviceMessagesField.text = "STATUS LOG\n";
+			deviceMessagesField.text = "This is the status log. The most recent messages will be at the top. \n";
 		}
 	}
 }

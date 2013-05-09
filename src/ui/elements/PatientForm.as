@@ -111,6 +111,10 @@ package ui.elements
 			return idNumber.text;	
 		}
 		
+		public function getProcedure():String {
+			return procedure.text;
+		}
+		
 		public function clearFields():void {
 			idNumber.text = "";
 			procedure.text = "";
