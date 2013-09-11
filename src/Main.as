@@ -11,31 +11,32 @@ package
 	
 	import flash.display.Sprite;
 	import flash.events.Event;
-	import flash.events.MouseEvent;
 	import flash.filesystem.File;
+	import flash.printing.PrintJob;
 	import flash.text.TextField;
 	import flash.text.TextFormat;
-	import flash.ui.Mouse;
-	import flash.ui.MouseCursor;
 	
 	import ui.elements.Button;
 	import ui.elements.Header;
 	import ui.elements.PatientForm;
+	import ui.elements.RecordingHeader;
+	import ui.elements.SkeletonContainer;
 	import ui.elements.StatusCircle;
 	import ui.elements.SubHeader;
 	
 	import util.recorder.PatientRecorder;
 	
 	
-	[SWF(frameRate="60", backgroundColor="#DDDDDD", width="1000", height="1000")]
+	[SWF(frameRate="60", backgroundColor="#DDDDDD", width="1000", height="850")]
 	public class Main extends Sprite
 	{
 		// Defaults
 		public static const KinectMaxDepthInFlash:uint = 200;
 		public static const WindowWidth:uint = 1000;
-		public static const WindowHeight:uint = 1000;
+		public static const WindowHeight:uint = 850;
 		[Embed(source="../fonts/segoeui.ttf", embedAsCFF="false", fontName="SegoeUI")]
 		public static const FONT_MARKER:String;
+		
 		// Edit this to change where the patient data is saved.
 		public static const filePath:String = "C:/Users/kinectpc/Patient Data/";
 		
@@ -45,11 +46,13 @@ package
 		// Kinect 1 Properties
 		private var device1:Kinect;
 		private var depthSkeletonContainer1:Sprite;
+		private var skeletonContainer1:SkeletonContainer;
 		private var exportDirectoryK1:File;
 		
 		// Kinect 2 Properties
 		private var device2:Kinect;
 		private var depthSkeletonContainer2:Sprite;
+		private var skeletonContainer2:SkeletonContainer;
 		private var exportDirectoryK2:File;
 		
 		// Errors
@@ -64,15 +67,28 @@ package
 		private var subHeader:SubHeader;
 		private var k1status:StatusCircle;
 		private var k2status:StatusCircle;
+		private var recFeedback:RecordingHeader;
 		private var form:PatientForm;
 		private var startButton:Button;
+		private var clearButton:Button;
 		
 		// Kinect Recorder
 		private var recorder1:PatientRecorder;
 		private var recorder2:PatientRecorder;
 		
+		// Print Out Report
+		private var printOut:Sprite;
+		private var textOutput:TextField;
+		
 		public function Main() {
 			if (Kinect.isSupported()) {
+				
+				// General Large Text Format
+				var largeTextFormat:TextFormat = new TextFormat();
+				largeTextFormat.font = "SegoeUI";
+				largeTextFormat.size = 20;
+				largeTextFormat.color = 0x666666;
+				
 				// Connect the devices.
 				device1 = Kinect.getDevice(0);
 				device2 = Kinect.getDevice(1);
@@ -89,25 +105,27 @@ package
 				
 				// Create the UI components to display for Kinect 1.
 				depthSkeletonContainer1 = new Sprite();
-				depthSkeletonContainer1.x = 0;
-				depthSkeletonContainer1.y = 480;
-				addChild(depthSkeletonContainer1);
+				skeletonContainer1 = new SkeletonContainer(depthSkeletonContainer1,"Kinect 1 Skeleton", 380, 300, largeTextFormat);
+				skeletonContainer1.x = 10;
+				skeletonContainer1.y = 540;
+				addChild(skeletonContainer1);
 				
 				// Create the UI components to display for Kinect 2.
 				depthSkeletonContainer2 = new Sprite();
-				depthSkeletonContainer2.x = 640;
-				depthSkeletonContainer2.y = 480;
-				addChild(depthSkeletonContainer2);
+				skeletonContainer2 = new SkeletonContainer(depthSkeletonContainer2,"Kinect 2 Skeleton", 380, 300, largeTextFormat);
+				skeletonContainer2.x = 395;
+				skeletonContainer2.y = 540;
+				addChild(skeletonContainer2);
 				
 				// Setup formatting for text.
 				textFormat = new TextFormat();
 				textFormat.font = "SegoeUI";
 				
 				// Instantiate the text fields.
-				debugMessagesField = new TextField(); // Stores info details.
-				
+				debugMessagesField = new TextField();
 				deviceMessagesField = new TextField();
 				deviceMessagesField.wordWrap = true;
+				
 				formatStatusLog(deviceMessagesField);
 				addChild(deviceMessagesField);
 				
@@ -120,6 +138,14 @@ package
 				k2status = new StatusCircle();
 				k2status.x = 0.92*WindowWidth + 48;
 				k2status.y = 25;
+				
+				recFeedback = new RecordingHeader();
+				recFeedback.embedFonts = true;
+				recFeedback.defaultTextFormat = largeTextFormat;
+				recFeedback.text = "REC";
+				recFeedback.x = WindowWidth - 150;
+				recFeedback.y = 15;
+				header.addChild(recFeedback);
 				header.addChild(k1status);
 				header.addChild(k2status);
 				addChild(header);
@@ -136,11 +162,15 @@ package
 				// Buttons
 				startButton = new Button(110,30, "Start Recording", 0x111111, 0xDDDDDD);
 				startButton.x = 450;
-				startButton.y = 380;
+				startButton.y = 450;
 				startButton.onClick(toggleRecordingHandler);
-				startButton.addEventListener(MouseEvent.ROLL_OVER, overHand);
-				startButton.addEventListener(MouseEvent.ROLL_OUT, outHand);
 				addChild(startButton);
+				
+				clearButton = new Button(90,30, "Clear Fields", 0x111111, 0xDDDDDD);
+				clearButton.x = 580;
+				clearButton.y = 450;
+				clearButton.onClick(form.clearFields);
+				addChild(clearButton);
 				
 				
 				// Add the Event Listeners to Kinect 1.
@@ -159,7 +189,7 @@ package
 				settings.rgbEnabled = true;
 				settings.rgbResolution = CameraResolution.RESOLUTION_160_120;
 				settings.depthEnabled = true;
-				settings.depthResolution = CameraResolution.RESOLUTION_640_480;
+				settings.depthResolution = CameraResolution.RESOLUTION_320_240;
 				settings.depthShowUserColors = false;
 				settings.skeletonEnabled = true;
 				settings.handTrackingEnabled = false;
@@ -168,55 +198,107 @@ package
 				device2.start(settings);
 				
 				addEventListener(Event.ENTER_FRAME, enterFrameHandler, false, 0, true);	
+				
+				// Setup page.
+				printOut = new Sprite();
+
+				textOutput = new TextField();
+				textOutput.embedFonts = true;
+				textOutput.defaultTextFormat = textFormat;
+				textOutput.width = 572; // Width - 2*Margin
+				textOutput.height = 752; // Height - 2*Margin
+				textOutput.wordWrap = true;
+				textOutput.textColor = 0x222222;
+				textOutput.border = true;
+				textOutput.borderColor = 0x000000;
+				textOutput.text = "\n\n";
+				
+				printOut.addChild(textOutput);
 			}
 		}
 		
 		private function onDeviceInfo(event:DeviceInfoEvent):void {
 			debugMessagesField.text += "INFO: " + event.message + "\n";
+			textOutput.text += "INFO: " + event.message + "\n";
 		}
 		
 		private function onDevice1Error(event:DeviceErrorEvent):void {
 			deviceMessagesField.text = "ERROR: Kinect 1 " + event.message + "\n" + deviceMessagesField.text;
+			textOutput.text += "ERROR: Kinect 1 " + event.message + "\n";
 			k1status.updateStatus(0xcb2300);
 		}
 		
 		private function onDevice2Error(event:DeviceErrorEvent):void {
 			deviceMessagesField.text = "ERROR: Kinect 2 " + event.message + "\n" + deviceMessagesField.text;
+			textOutput.text += "ERROR: Kinect 2 " + event.message + "\n";
 			k2status.updateStatus(0xcb2300);
 		}
 		
 		protected function kinect1StartedHandler(event:DeviceEvent):void {
 			deviceMessagesField.text = "Kinect 1 has been initialized.\n" + deviceMessagesField.text;
+			textOutput.text += "Kinect 1 has been initialized.\n";
 			k1status.updateStatus();
 		}
 		
 		protected function kinect2StartedHandler(event:DeviceEvent):void {
 			deviceMessagesField.text = "Kinect 2 has been initialized.\n" + deviceMessagesField.text;
+			textOutput.text += "Kinect 2 has been initialized.\n";
 			k2status.updateStatus();
 		}
 		
 		protected function kinect1StoppedHandler(event:DeviceEvent):void {
 			deviceMessagesField.text = "Kinect 1 has stopped [restart app].\n" + deviceMessagesField.text;
+			textOutput.text += "Kinect 1 has stopped [restart app].\n";
 			k1status.updateStatus(0xcb2300);
 		}
 		
 		protected function kinect2StoppedHandler(event:DeviceEvent):void {
 			deviceMessagesField.text = "Kinect 2 has stopped [restart app]\n" + deviceMessagesField.text;
+			textOutput.text += "Kinect 2 has stopped [restart app]\n";
 			k2status.updateStatus(0xcb2300);
 		}
 		
 		protected function toggleRecordingHandler(event:Event):void {
 			if (recorder1.isRecording() && recorder2.isRecording()) {
 				startButton.setText("Start Recording");
-				recorder1.stopRecording(form.getJSONString());
-				recorder2.stopRecording(form.getJSONString());
+				var formData:String = form.getJSONString();
+				recorder1.stopRecording(formData);
+				recorder2.stopRecording(formData);
+				
+				textOutput.text += "\n\n============= DATA STATISTICS ============= \n";
+				textOutput.text += formData + "\n";
+				textOutput.text += "\n====== KINECT 1 RECORDING SETTINGS ====== \n";
+				textOutput.text += recorder1.getJSONKinectData() + "\n";
+				textOutput.text += "\n====== KINECT 2 RECORDING SETTINGS ====== \n";
+				textOutput.text += recorder1.getJSONKinectData() + "\n";
+				
+				recFeedback.deactivate();
+				
+				// Print data.
+				var printJob:PrintJob = new PrintJob();
+				if (printJob.start()) {
+					try {
+						printJob.addPage(printOut);
+						printJob.send();
+					}
+					catch(e:Error) {
+						deviceMessagesField.text = "Printing job failed (or cancelled). \n" + deviceMessagesField.text;
+					}
+				}
+				else {
+					deviceMessagesField.text = "Printing job could not start. \n" + deviceMessagesField.text;
+				}
+				
+				// Clear Print Out.
+				textOutput.text = "\n\n";
 				
 				// Report success, and clear fields for next patient.
 				deviceMessagesField.text = "Patient " + form.getPatientNumber() + " saved for procedure: " + form.getProcedure() + "\n" + deviceMessagesField.text;
-				form.clearFields();	
 			}
-			else if (!recorder1.isRecording() && !recorder2.isRecording() && form.getPatientNumber() != "") {
+			else if (!recorder1.isRecording() && !recorder2.isRecording() && form.getPatientNumber() != "" && form.getProcedure() != "") {
 				var date:Date = new Date();
+				deviceMessagesField.text = "Recording has started for patient " + form.getPatientNumber() + "\n" + deviceMessagesField.text;
+				textOutput.text += "Recording has started for patient " + form.getPatientNumber() + "\n" + deviceMessagesField.text;
 				startButton.setText("Stop Recording");
 				exportDirectoryK1 = File.documentsDirectory.resolvePath(filePath + form.getPatientNumber() + " - " + form.getProcedure()
 					+ " - " + date.toDateString() + " " + date.hours + "-" + date.minutes + "/" + "Kinect1/");
@@ -224,9 +306,13 @@ package
 					+ " - " + date.toDateString() + " " + date.hours + "-" + date.minutes + "/" + "Kinect2/");
 				recorder1.startRecording(device1, exportDirectoryK1);
 				recorder2.startRecording(device2, exportDirectoryK2);
+				recFeedback.activate();
 			}
-			else {
+			else if (form.getPatientNumber() == "") {
 				deviceMessagesField.text = "Please input patient number.\n" + deviceMessagesField.text;
+			}
+			else if (form.getProcedure() == "") {
+				deviceMessagesField.text = "Please input the procedure.\n" + deviceMessagesField.text;
 			}
 		}
 		
@@ -238,7 +324,7 @@ package
 				if (user1.hasSkeleton) {
 					for each(var joint1:SkeletonJoint in user1.skeletonJoints) {
 						depthSkeletonContainer1.graphics.beginFill(0xFF0000, joint1.positionConfidence);
-						depthSkeletonContainer1.graphics.drawCircle(joint1.position.depth.x, joint1.position.depth.y, 5);
+						depthSkeletonContainer1.graphics.drawCircle(joint1.position.rgb.x, joint1.position.rgb.y, 5);
 						depthSkeletonContainer1.graphics.endFill();
 					}
 				}
@@ -247,19 +333,11 @@ package
 				if (user2.hasSkeleton) {
 					for each(var joint2:SkeletonJoint in user2.skeletonJoints) {
 						depthSkeletonContainer2.graphics.beginFill(0xFF0000, joint2.positionConfidence);
-						depthSkeletonContainer2.graphics.drawCircle(joint2.position.depth.x, joint2.position.depth.y, 5);
+						depthSkeletonContainer2.graphics.drawCircle(joint2.position.rgb.x, joint2.position.rgb.y, 5);
 						depthSkeletonContainer2.graphics.endFill();
 					}
 				}
 			}
-		}
-		
-		private function overHand(e:MouseEvent):void {
-			Mouse.cursor=MouseCursor.BUTTON;
-		}
-		
-		private function outHand(e:MouseEvent):void {
-			Mouse.cursor=MouseCursor.ARROW;
 		}
 		
 		/** Helper Function **/
@@ -268,7 +346,7 @@ package
 			deviceMessagesField.embedFonts = true;
 			deviceMessagesField.defaultTextFormat = textFormat;
 			deviceMessagesField.width = 220;
-			deviceMessagesField.height = 908;
+			deviceMessagesField.height = 758;
 			deviceMessagesField.background = true;
 			deviceMessagesField.backgroundColor = 0xEEEEEE;
 			deviceMessagesField.textColor = 0x222222;

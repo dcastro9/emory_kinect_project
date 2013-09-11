@@ -1,18 +1,22 @@
 package ui.elements
 {	
 	import flash.display.Sprite;
+	import flash.events.Event;
 	import flash.text.TextField;
 	import flash.text.TextFormat;
 	
 	public class PatientForm extends Sprite
 	{
+		public static const ProcedureChoices:Array = new Array("Walking", "Jogging", "Running");
 		
 		private var idNumber:TextField;
 		private var procedure:TextField;
+		private var procChoice:RadioButton;
 		private var comments:TextField;
 		
 		private var idLabel:TextField;
 		private var procLabel:TextField;
+		private var otherChoice:TextField;
 		private var commentsLabel:TextField;
 		
 		private var textFormat:TextFormat;
@@ -55,8 +59,6 @@ package ui.elements
 			idNumber.type = "input";
 			idNumber.embedFonts = true;
 			idNumber.defaultTextFormat = textFormat;
-			idNumber.restrict = "0123456789";
-			idNumber.maxChars = 15; // TODO(dcastro9): Update with appropriate number.
 			addChild(idNumber);
 			
 			procLabel = new TextField();
@@ -67,23 +69,38 @@ package ui.elements
 			procLabel.height = fieldHeight;
 			procLabel.text = "Procedure:";
 			addChild(procLabel);
+			procChoice = new RadioButton(ProcedureChoices, 80, 30, 0xCCCCCC, 0x000000, 0x66AAFF, clearProcedure);
+			procChoice.x = 120;
+			procChoice.y = fieldHeight + padding;
+			addChild(procChoice);
+			
+			otherChoice = new TextField();
+			otherChoice.embedFonts = true;
+			otherChoice.defaultTextFormat = labelFormat;
+			otherChoice.x = 90;
+			otherChoice.y = 2*(fieldHeight + padding/2);
+			otherChoice.width = fieldWidth;
+			otherChoice.height = fieldHeight;
+			otherChoice.text = "Other:";
+			addChild(otherChoice);
 			procedure = new TextField();
 			procedure.border = true;
 			procedure.background = true;
 			procedure.backgroundColor = bgColor;
-			procedure.width = fieldWidth;
-			procedure.height = fieldHeight;
-			procedure.x = 120;
-			procedure.y = fieldHeight + padding;
+			procedure.width = fieldWidth/2;
+			procedure.height = fieldHeight/1.5;
+			procedure.x = 150;
+			procedure.y = 2*(fieldHeight + padding/2);
 			procedure.type = "input";
 			procedure.embedFonts = true;
 			procedure.defaultTextFormat = textFormat;
+			procedure.addEventListener(Event.CHANGE, assessProcedure);
 			addChild(procedure);
 			
 			commentsLabel = new TextField();
 			commentsLabel.embedFonts = true;
 			commentsLabel.defaultTextFormat = labelFormat;
-			commentsLabel.y = 2*(fieldHeight + padding);
+			commentsLabel.y = 3*(fieldHeight + padding);
 			commentsLabel.width = fieldWidth;
 			commentsLabel.height = fieldHeight;
 			commentsLabel.text = "Comments:";
@@ -96,7 +113,7 @@ package ui.elements
 			comments.width = fieldWidth;
 			comments.height = fieldHeight*2;
 			comments.x = 120;
-			comments.y = 2*(fieldHeight + padding);
+			comments.y = 3*(fieldHeight + padding);
 			comments.type = "input";
 			comments.embedFonts = true;
 			comments.defaultTextFormat = commentFormat;
@@ -104,7 +121,7 @@ package ui.elements
 		}
 		
 		public function getJSONString():String {
-			return '{"id" : ' + idNumber.text + ', "procedure" : "' + procedure.text + '", "comments" : "' + comments.text + '"}';
+			return '{"id" : ' + idNumber.text + ', "procedure" : "' + getProcedure() + '", "comments" : "' + comments.text + '"}';
 		}
 		
 		public function getPatientNumber():String {
@@ -112,13 +129,29 @@ package ui.elements
 		}
 		
 		public function getProcedure():String {
-			return procedure.text;
+			if (procedure.text != "") {
+				return procedure.text;
+			}
+			else {
+				return procChoice.getActiveButton();
+			}
 		}
 		
-		public function clearFields():void {
+		private function clearProcedure():void {
+			procedure.text = "";
+		}
+		
+		public function clearFields(event:Event):void {
 			idNumber.text = "";
 			procedure.text = "";
 			comments.text = "";
+			procChoice.resetToDefaultBackground();
+		}
+		
+		private function assessProcedure(event:Event):void {
+			if (event.currentTarget.text != "") {
+				procChoice.resetToDefaultBackground();
+			}
 		}
 	}
 }

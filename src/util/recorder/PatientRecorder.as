@@ -7,7 +7,6 @@ package util.recorder
 	import com.as3nui.nativeExtensions.air.kinect.events.UserFrameEvent;
 	
 	import flash.display.BitmapData;
-	import flash.events.Event;
 	import flash.filesystem.File;
 	import flash.filesystem.FileMode;
 	import flash.filesystem.FileStream;
@@ -83,7 +82,6 @@ package util.recorder
 				}
 				
 				// save the other data.
-				
 				var _patientDetailsFile:File = _exportDirectory.resolvePath("patient_details.json");
 				var patientDetailsFileStream:FileStream = new FileStream();
 				var settingsFileStream:FileStream = new FileStream();
@@ -91,6 +89,10 @@ package util.recorder
 				settingsFileStream.writeUTFBytes(otherData);
 				settingsFileStream.close();
 			}
+		}
+		
+		public function getJSONKinectData():String {
+			return JSON.stringify(_kinect.settings);
 		}
 		
 		private function copySettings():void {
