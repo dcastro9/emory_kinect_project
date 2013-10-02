@@ -16,20 +16,25 @@ package
 	import flash.text.TextField;
 	import flash.text.TextFormat;
 	
+	import flare.vis.Visualization;
+	import flare.vis.data.Data;
+	
 	import ui.elements.Button;
+	import ui.elements.Document;
 	import ui.elements.Header;
+	import ui.elements.Page;
 	import ui.elements.PatientForm;
 	import ui.elements.RecordingHeader;
 	import ui.elements.SkeletonContainer;
 	import ui.elements.StatusCircle;
 	import ui.elements.SubHeader;
+	import ui.elements.VisualizationPage;
 	
 	import util.recorder.PatientRecorder;
 	
 	
 	[SWF(frameRate="60", backgroundColor="#DDDDDD", width="1000", height="850")]
-	public class Main extends Sprite
-	{
+	public class Main extends Sprite {
 		// Defaults
 		public static const KinectMaxDepthInFlash:uint = 200;
 		public static const WindowWidth:uint = 1000;
@@ -76,9 +81,10 @@ package
 		private var recorder1:PatientRecorder;
 		private var recorder2:PatientRecorder;
 		
-		// Print Out Report
-		private var printOut:Sprite;
-		private var textOutput:TextField;
+		// Report Elements
+		private var document:Document;
+		private var current_data:Data;
+		private var visPage:VisualizationPage;
 		
 		public function Main() {
 			if (Kinect.isSupported()) {
@@ -199,62 +205,53 @@ package
 				
 				addEventListener(Event.ENTER_FRAME, enterFrameHandler, false, 0, true);	
 				
-				// Setup page.
-				printOut = new Sprite();
-
-				textOutput = new TextField();
-				textOutput.embedFonts = true;
-				textOutput.defaultTextFormat = textFormat;
-				textOutput.width = 572; // Width - 2*Margin
-				textOutput.height = 752; // Height - 2*Margin
-				textOutput.wordWrap = true;
-				textOutput.textColor = 0x222222;
-				textOutput.border = true;
-				textOutput.borderColor = 0x000000;
-				textOutput.text = "\n\n";
+				document = new Document(1);
+				document.addHeader(0, "Kinect Technical Report");
+				visPage = new VisualizationPage();
+				document.addPage(visPage);
 				
-				printOut.addChild(textOutput);
+				current_data = new Data();
 			}
 		}
 		
 		private function onDeviceInfo(event:DeviceInfoEvent):void {
 			debugMessagesField.text += "INFO: " + event.message + "\n";
-			textOutput.text += "INFO: " + event.message + "\n";
+			document.getPage(0).appendContent("INFO: " + event.message + "\n");
 		}
 		
 		private function onDevice1Error(event:DeviceErrorEvent):void {
 			deviceMessagesField.text = "ERROR: Kinect 1 " + event.message + "\n" + deviceMessagesField.text;
-			textOutput.text += "ERROR: Kinect 1 " + event.message + "\n";
+			document.getPage(0).appendContent("ERROR: Kinect 1 " + event.message + "\n");
 			k1status.updateStatus(0xcb2300);
 		}
 		
 		private function onDevice2Error(event:DeviceErrorEvent):void {
 			deviceMessagesField.text = "ERROR: Kinect 2 " + event.message + "\n" + deviceMessagesField.text;
-			textOutput.text += "ERROR: Kinect 2 " + event.message + "\n";
+			document.getPage(0).appendContent("ERROR: Kinect 2 " + event.message + "\n");
 			k2status.updateStatus(0xcb2300);
 		}
 		
 		protected function kinect1StartedHandler(event:DeviceEvent):void {
 			deviceMessagesField.text = "Kinect 1 has been initialized.\n" + deviceMessagesField.text;
-			textOutput.text += "Kinect 1 has been initialized.\n";
+			document.getPage(0).appendContent("Kinect 1 has been initialized.\n");
 			k1status.updateStatus();
 		}
 		
 		protected function kinect2StartedHandler(event:DeviceEvent):void {
 			deviceMessagesField.text = "Kinect 2 has been initialized.\n" + deviceMessagesField.text;
-			textOutput.text += "Kinect 2 has been initialized.\n";
+			document.getPage(0).appendContent("Kinect 2 has been initialized.\n");
 			k2status.updateStatus();
 		}
 		
 		protected function kinect1StoppedHandler(event:DeviceEvent):void {
 			deviceMessagesField.text = "Kinect 1 has stopped [restart app].\n" + deviceMessagesField.text;
-			textOutput.text += "Kinect 1 has stopped [restart app].\n";
+			document.getPage(0).appendContent("Kinect 1 has stopped [restart app].\n");
 			k1status.updateStatus(0xcb2300);
 		}
 		
 		protected function kinect2StoppedHandler(event:DeviceEvent):void {
 			deviceMessagesField.text = "Kinect 2 has stopped [restart app]\n" + deviceMessagesField.text;
-			textOutput.text += "Kinect 2 has stopped [restart app]\n";
+			document.getPage(0).appendContent("Kinect 2 has stopped [restart app]\n");
 			k2status.updateStatus(0xcb2300);
 		}
 		
@@ -265,32 +262,26 @@ package
 				recorder1.stopRecording(formData);
 				recorder2.stopRecording(formData);
 				
-				textOutput.text += "\n\n============= DATA STATISTICS ============= \n";
-				textOutput.text += formData + "\n";
-				textOutput.text += "\n====== KINECT 1 RECORDING SETTINGS ====== \n";
-				textOutput.text += recorder1.getJSONKinectData() + "\n";
-				textOutput.text += "\n====== KINECT 2 RECORDING SETTINGS ====== \n";
-				textOutput.text += recorder1.getJSONKinectData() + "\n";
-				
+				document.getPage(0).appendContent("\n\n============= DATA STATISTICS ============= \n");
+				document.getPage(0).appendContent(formData + "\n");
+				document.getPage(0).appendContent("\n====== KINECT 1 RECORDING SETTINGS ====== \n");
+				document.getPage(0).appendContent(recorder1.getJSONKinectData() + "\n");
+				document.getPage(0).appendContent("\n====== KINECT 2 RECORDING SETTINGS ====== \n");
+				document.getPage(0).appendContent(recorder1.getJSONKinectData() + "\n");
 				recFeedback.deactivate();
-				
-				// Print data.
-				var printJob:PrintJob = new PrintJob();
-				if (printJob.start()) {
-					try {
-						printJob.addPage(printOut);
-						printJob.send();
-					}
-					catch(e:Error) {
-						deviceMessagesField.text = "Printing job failed (or cancelled). \n" + deviceMessagesField.text;
-					}
+	
+				try {
+					visPage.addData(current_data);
+					var printJob:PrintJob = new PrintJob();
+					printJob.start();
+					document.printDocument(printJob);
 				}
-				else {
-					deviceMessagesField.text = "Printing job could not start. \n" + deviceMessagesField.text;
+				catch(e:Error) {
+					deviceMessagesField.text = "Printing job failed (or cancelled). \n" + deviceMessagesField.text;
 				}
 				
 				// Clear Print Out.
-				textOutput.text = "\n\n";
+				document.getPage(0).clearContent();
 				
 				// Report success, and clear fields for next patient.
 				deviceMessagesField.text = "Patient " + form.getPatientNumber() + " saved for procedure: " + form.getProcedure() + "\n" + deviceMessagesField.text;
@@ -298,7 +289,7 @@ package
 			else if (!recorder1.isRecording() && !recorder2.isRecording() && form.getPatientNumber() != "" && form.getProcedure() != "") {
 				var date:Date = new Date();
 				deviceMessagesField.text = "Recording has started for patient " + form.getPatientNumber() + "\n" + deviceMessagesField.text;
-				textOutput.text += "Recording has started for patient " + form.getPatientNumber() + "\n" + deviceMessagesField.text;
+				//textOutput.text += "Recording has started for patient " + form.getPatientNumber() + "\n" + deviceMessagesField.text;
 				startButton.setText("Stop Recording");
 				exportDirectoryK1 = File.documentsDirectory.resolvePath(filePath + form.getPatientNumber() + " - " + form.getProcedure()
 					+ " - " + date.toDateString() + " " + date.hours + "-" + date.minutes + "/" + "Kinect1/");
@@ -320,9 +311,27 @@ package
 			depthSkeletonContainer1.graphics.clear();
 			depthSkeletonContainer2.graphics.clear();
 			
+			current_data.addNode({
+				value1: int(1 + 9*Math.random()),
+				value2: int(200*(Math.random()-0.5))
+			});
+			
 			for each(var user1:User in device1.users) {
+				
+				
 				if (user1.hasSkeleton) {
+					var rightShoulderPos:int = -1;
 					for each(var joint1:SkeletonJoint in user1.skeletonJoints) {
+						if (joint1.name == "right_shoulder") {
+							rightShoulderPos = joint1.position.world.z;
+						}
+						if (joint1.name == "right_hand" && rightShoulderPos != -1) {
+							trace("Adding data -- " + (joint1.position.world.z - rightShoulderPos));
+							current_data.addNode({
+								value1: joint1.position.world.z - rightShoulderPos,
+								value2: current_data.length
+							});
+						}
 						depthSkeletonContainer1.graphics.beginFill(0xFF0000, joint1.positionConfidence);
 						depthSkeletonContainer1.graphics.drawCircle(joint1.position.rgb.x, joint1.position.rgb.y, 5);
 						depthSkeletonContainer1.graphics.endFill();
@@ -336,6 +345,7 @@ package
 						depthSkeletonContainer2.graphics.drawCircle(joint2.position.rgb.x, joint2.position.rgb.y, 5);
 						depthSkeletonContainer2.graphics.endFill();
 					}
+					// View two.
 				}
 			}
 		}
