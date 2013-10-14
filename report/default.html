@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Kinect Technical Report</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+
+        <link href='http://fonts.googleapis.com/css?family=Open+Sans|Lobster' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="../css/vendor/normalize.css">
+        <link rel="stylesheet" href="../css/vendor/bootstrap.min.css">
+        <link rel="stylesheet" href="../css/vendor/bootstrap-responsive.min.css">
+        <link rel="stylesheet" href="../css/main.css">
+        <script src="../js/vendor/modernizr-2.6.2.min.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+            Kinect Technical Report
+            </div>
+            <div class="subheader">
+                <div class="patient">Patient: </div> | 
+                <div class="procedure">Procedure: </div> | 
+                <div class="date"></div>
+            </div>
+            <div class="description"> Description: </div>
+            <div class="layout_2">
+                <div class="left status_report">
+                    <div class="status_header">Status Report</div>
+                    <div class="status_log">
+                        <ul>
+                        </ul>
+                    </div>
+                </div>
+                <div class="right">
+                    <div class="time_taken">
+                        <div class="text"> Time Taken </div>
+                        <div class="time"> </div>
+                    </div>
+                </div>
+            </div>
+            <div class="graph_pair">
+                <div class="graph_left">
+                    <div class="title"> Left Foot - Lift from Ground</div>
+                    <canvas id="graph1" height="250" />
+                </div>
+                <div class="graph_right">
+                    <div class="title"> Right Foot - Lift from Ground</div>
+                    <canvas id="graph2" height="250" />
+                </div>
+            </div>
+            <div class="graph_pair">
+                <div class="graph_left">
+                    <div class="title"> Left Hand - Relative to Elbow</div>
+                    <canvas id="graph3" height="250" />
+                </div>
+                <div class="graph_right">
+                    <div class="title"> Right Hand - Relative to Elbow</div>
+                    <canvas id="graph4" height="250" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Javascript files at the end -->
+        <script src="../js/vendor/jquery-1.9.1.min.js"></script>
+        <script src="../js/vendor/bootstrap.min.js"></script>
+        <script src="../js/vendor/chart.min.js"></script>
+        <script src="../js/vendor/underscore.min.js"></script>
+        <script src="../js/plugins.js"></script>
+        <script src="../js/main.js"></script>
+
+        <script>
+            function drawLineGraph(canvas_id, data) {
+                if (data != undefined) {
+                    randomRed = Math.floor(Math.random()*215 + 40);
+                    randomBlue = Math.floor(Math.random()*215 + 40);
+                    randomGreen = Math.floor(Math.random()*215 + 40);
+                    sRed = randomRed - 40;
+                    sBlue = randomBlue - 40;
+                    sGreen = randomGreen - 40;
+                    var settings = {
+                        labels : _.range(1,data.length+1),
+                        datasets : [
+                            {
+                                fillColor : "rgba(" + randomRed + "," + randomBlue + "," + randomGreen + ",0.5)",
+                                strokeColor : "rgba(" + sRed + "," + sBlue + "," + sGreen + ",1)",
+                                pointColor : "rgba(" + sRed + "," + sBlue + "," + sGreen + ",1)",
+                                pointStrokeColor : "#fff",
+                                data : data
+                            }
+                    ]};
+                    var ch = new Chart(document.getElementById(canvas_id).getContext("2d")).Line(settings);
+                }
+            }
+
+            $.getJSON("report.json", function(data) {
+                console.log(data);
+                $(".subheader > .patient").text($(".subheader > .patient").text() + data['patient_id']);
+                $(".subheader > .procedure").text($(".subheader > .procedure").text() + data['procedure']);
+                $(".subheader > .date").text($(".subheader > .date").text() + data['date']);
+                $(".description").text($(".description").text() + data['description']);
+                $(".time_taken > .time").text(data['time_taken']);
+
+                // TODO(dcastro): Figure out the proper notation that the status log will be passed in as.
+                $(".status_report > .status_log").append(data['status_report']);
+
+                $("canvas").each(function() {
+                    $(this).attr("width", Math.min(450, $(".graph_right").width()));
+                });
+
+                drawLineGraph('graph1', data['left_foot_x']);
+                drawLineGraph('graph2', data['right_foot_x']);
+                drawLineGraph('graph3', data['left_hand_z']);
+                drawLineGraph('graph4', data['right_hand_z']);
+                
+
+            });
+
+            
+        </script>
+    </body>
+</html>
