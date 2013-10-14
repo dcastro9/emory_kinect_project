@@ -12,23 +12,17 @@ package
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.filesystem.File;
-	import flash.printing.PrintJob;
 	import flash.text.TextField;
 	import flash.text.TextFormat;
-	
-	import flare.vis.Visualization;
-	import flare.vis.data.Data;
+	import flash.utils.getTimer;
 	
 	import ui.elements.Button;
-	import ui.elements.Document;
 	import ui.elements.Header;
-	import ui.elements.Page;
 	import ui.elements.PatientForm;
 	import ui.elements.RecordingHeader;
 	import ui.elements.SkeletonContainer;
 	import ui.elements.StatusCircle;
 	import ui.elements.SubHeader;
-	import ui.elements.VisualizationPage;
 	
 	import util.recorder.PatientRecorder;
 	
@@ -44,6 +38,7 @@ package
 		
 		// Edit this to change where the patient data is saved.
 		public static const filePath:String = "C:/Users/kinectpc/Patient Data/";
+		public static const webPath:String = "C:/web/";
 		
 		// General Kinect Settings
 		private var settings:KinectSettings;
@@ -81,10 +76,8 @@ package
 		private var recorder1:PatientRecorder;
 		private var recorder2:PatientRecorder;
 		
-		// Report Elements
-		private var document:Document;
-		private var current_data:Data;
-		private var visPage:VisualizationPage;
+		// Timer for elapsed time.
+		private var startTime:int;
 		
 		public function Main() {
 			if (Kinect.isSupported()) {
@@ -204,97 +197,97 @@ package
 				device2.start(settings);
 				
 				addEventListener(Event.ENTER_FRAME, enterFrameHandler, false, 0, true);	
-				
-				document = new Document(1);
-				document.addHeader(0, "Kinect Technical Report");
-				visPage = new VisualizationPage();
-				document.addPage(visPage);
-				
-				current_data = new Data();
 			}
 		}
 		
 		private function onDeviceInfo(event:DeviceInfoEvent):void {
 			debugMessagesField.text += "INFO: " + event.message + "\n";
-			document.getPage(0).appendContent("INFO: " + event.message + "\n");
+			form.appendToLog("<li>INFO: " + event.message + "</li>");
 		}
 		
 		private function onDevice1Error(event:DeviceErrorEvent):void {
 			deviceMessagesField.text = "ERROR: Kinect 1 " + event.message + "\n" + deviceMessagesField.text;
-			document.getPage(0).appendContent("ERROR: Kinect 1 " + event.message + "\n");
+			form.appendToLog("<li>ERROR: Kinect 1 " + event.message + "</li>");
 			k1status.updateStatus(0xcb2300);
 		}
 		
 		private function onDevice2Error(event:DeviceErrorEvent):void {
 			deviceMessagesField.text = "ERROR: Kinect 2 " + event.message + "\n" + deviceMessagesField.text;
-			document.getPage(0).appendContent("ERROR: Kinect 2 " + event.message + "\n");
+			form.appendToLog("<li>ERROR: Kinect 2 " + event.message + "</li>");
 			k2status.updateStatus(0xcb2300);
 		}
 		
 		protected function kinect1StartedHandler(event:DeviceEvent):void {
 			deviceMessagesField.text = "Kinect 1 has been initialized.\n" + deviceMessagesField.text;
-			document.getPage(0).appendContent("Kinect 1 has been initialized.\n");
+			form.appendToLog("<li>Kinect 1 has been initialized.</li>");
 			k1status.updateStatus();
 		}
 		
 		protected function kinect2StartedHandler(event:DeviceEvent):void {
 			deviceMessagesField.text = "Kinect 2 has been initialized.\n" + deviceMessagesField.text;
-			document.getPage(0).appendContent("Kinect 2 has been initialized.\n");
+			form.appendToLog("<li>Kinect 2 has been initialized.</li>");
 			k2status.updateStatus();
 		}
 		
 		protected function kinect1StoppedHandler(event:DeviceEvent):void {
 			deviceMessagesField.text = "Kinect 1 has stopped [restart app].\n" + deviceMessagesField.text;
-			document.getPage(0).appendContent("Kinect 1 has stopped [restart app].\n");
+			form.appendToLog("<li>Kinect 1 has stopped [restart app].</li>");
 			k1status.updateStatus(0xcb2300);
 		}
 		
 		protected function kinect2StoppedHandler(event:DeviceEvent):void {
 			deviceMessagesField.text = "Kinect 2 has stopped [restart app]\n" + deviceMessagesField.text;
-			document.getPage(0).appendContent("Kinect 2 has stopped [restart app]\n");
+			form.appendToLog("<li>Kinect 2 has stopped [restart app]</li>");
 			k2status.updateStatus(0xcb2300);
 		}
 		
 		protected function toggleRecordingHandler(event:Event):void {
 			if (recorder1.isRecording() && recorder2.isRecording()) {
+				// Switch button text to say start recording again.
 				startButton.setText("Start Recording");
+				
+				// Record how long it took for the patient to walk (from start to stop).
+				var currentTime:int = getTimer();
+				form.setTimeElapsed((int)(currentTime - startTime)*0.001);
+				
+				// Save report to web accessible directory.
+				var date:Date = new Date();
+				var settingsDirectory:File = File.documentsDirectory.resolvePath(webPath + form.getPatientNumber() + " - " + form.getProcedure()
+					+ " - " + date.toDateString() + " " + date.hours + "-" + date.minutes + "/");
+				form.outputToWeb(settingsDirectory);
+				
+				// Get form data to save to patient data directory.
 				var formData:String = form.getJSONString();
+				
+				// Stop recording -- save form data.
 				recorder1.stopRecording(formData);
 				recorder2.stopRecording(formData);
 				
-				document.getPage(0).appendContent("\n\n============= DATA STATISTICS ============= \n");
-				document.getPage(0).appendContent(formData + "\n");
-				document.getPage(0).appendContent("\n====== KINECT 1 RECORDING SETTINGS ====== \n");
-				document.getPage(0).appendContent(recorder1.getJSONKinectData() + "\n");
-				document.getPage(0).appendContent("\n====== KINECT 2 RECORDING SETTINGS ====== \n");
-				document.getPage(0).appendContent(recorder1.getJSONKinectData() + "\n");
+				// Turn off recording button from red to grey.
 				recFeedback.deactivate();
-	
-				try {
-					visPage.addData(current_data);
-					var printJob:PrintJob = new PrintJob();
-					printJob.start();
-					document.printDocument(printJob);
-				}
-				catch(e:Error) {
-					deviceMessagesField.text = "Printing job failed (or cancelled). \n" + deviceMessagesField.text;
-				}
-				
-				// Clear Print Out.
-				document.getPage(0).clearContent();
 				
 				// Report success, and clear fields for next patient.
 				deviceMessagesField.text = "Patient " + form.getPatientNumber() + " saved for procedure: " + form.getProcedure() + "\n" + deviceMessagesField.text;
+				
+				// Clear the form for a new patient to be recorded.
+				form.clearFields();
 			}
 			else if (!recorder1.isRecording() && !recorder2.isRecording() && form.getPatientNumber() != "" && form.getProcedure() != "") {
-				var date:Date = new Date();
+				// Reset the start time.
+				startTime = getTimer();
+				var cur_date:Date = new Date();
+				
+				// Log recording has started.
 				deviceMessagesField.text = "Recording has started for patient " + form.getPatientNumber() + "\n" + deviceMessagesField.text;
-				//textOutput.text += "Recording has started for patient " + form.getPatientNumber() + "\n" + deviceMessagesField.text;
 				startButton.setText("Stop Recording");
+				
+				// Resolve paths to export data.
 				exportDirectoryK1 = File.documentsDirectory.resolvePath(filePath + form.getPatientNumber() + " - " + form.getProcedure()
-					+ " - " + date.toDateString() + " " + date.hours + "-" + date.minutes + "/" + "Kinect1/");
+					+ " - " + cur_date.toDateString() + " " + cur_date.hours + "-" + cur_date.minutes + "/" + "Kinect1/");
 				exportDirectoryK2 = File.documentsDirectory.resolvePath(filePath + form.getPatientNumber() + " - " + form.getProcedure()
-					+ " - " + date.toDateString() + " " + date.hours + "-" + date.minutes + "/" + "Kinect2/");
+					+ " - " + cur_date.toDateString() + " " + cur_date.hours + "-" + cur_date.minutes + "/" + "Kinect2/");
+				
+				// Start recording, activate recording button.
 				recorder1.startRecording(device1, exportDirectoryK1);
 				recorder2.startRecording(device2, exportDirectoryK2);
 				recFeedback.activate();
@@ -311,27 +304,40 @@ package
 			depthSkeletonContainer1.graphics.clear();
 			depthSkeletonContainer2.graphics.clear();
 			
-			current_data.addNode({
-				value1: int(1 + 9*Math.random()),
-				value2: int(200*(Math.random()-0.5))
-			});
-			
 			for each(var user1:User in device1.users) {
 				
 				
 				if (user1.hasSkeleton) {
+					var leftShoulderPos:int = -1;
 					var rightShoulderPos:int = -1;
 					for each(var joint1:SkeletonJoint in user1.skeletonJoints) {
+						
+						// Get Left Hand Data
+						if (joint1.name == "left_shoulder") {
+							leftShoulderPos = joint1.position.world.z;
+						}
+						if (joint1.name == "left_hand" && leftShoulderPos != -1) {
+							form.addLeftHandData(joint1.position.world.z - leftShoulderPos);
+						}
+						
+						// Right Hand Data
 						if (joint1.name == "right_shoulder") {
 							rightShoulderPos = joint1.position.world.z;
 						}
 						if (joint1.name == "right_hand" && rightShoulderPos != -1) {
-							trace("Adding data -- " + (joint1.position.world.z - rightShoulderPos));
-							current_data.addNode({
-								value1: joint1.position.world.z - rightShoulderPos,
-								value2: current_data.length
-							});
+							form.addRightHandData(joint1.position.world.z - rightShoulderPos);
 						}
+						
+						// Left Foot Data
+						if (joint1.name == "left_foot") {
+							form.addLeftFootData(joint1.position.world.x);
+						}
+						
+						// Right Foot Data
+						if (joint1.name == "right_foot") {
+							form.addRightFootData(joint1.position.world.x);
+						}
+						
 						depthSkeletonContainer1.graphics.beginFill(0xFF0000, joint1.positionConfidence);
 						depthSkeletonContainer1.graphics.drawCircle(joint1.position.rgb.x, joint1.position.rgb.y, 5);
 						depthSkeletonContainer1.graphics.endFill();

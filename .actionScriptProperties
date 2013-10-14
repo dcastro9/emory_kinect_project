@@ -31,7 +31,6 @@
         </excludedEntries>
       </libraryPathEntry>
       <libraryPathEntry kind="3" linkType="1" path="libs/airkinect-2-core-mssdk.ane" useDefaultLinkType="false"/>
-      <libraryPathEntry kind="3" linkType="1" path="libs/flare.swc" useDefaultLinkType="false"/>
       <libraryPathEntry kind="5" linkType="2" path="libs/airkinect-2-core-mssdk.ane"/>
     </libraryPath>
     <sourceAttachmentPath/>

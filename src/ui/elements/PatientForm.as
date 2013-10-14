@@ -2,6 +2,9 @@ package ui.elements
 {	
 	import flash.display.Sprite;
 	import flash.events.Event;
+	import flash.filesystem.File;
+	import flash.filesystem.FileMode;
+	import flash.filesystem.FileStream;
 	import flash.text.TextField;
 	import flash.text.TextFormat;
 	
@@ -22,6 +25,16 @@ package ui.elements
 		private var textFormat:TextFormat;
 		private var commentFormat:TextFormat;
 		private var labelFormat:TextFormat;
+		
+		private var statusLog:String;
+		private var timeElapsed:int;
+		
+		// Data storage.
+		private var leftFootData:Array;
+		private var rightFootData:Array;
+		private var leftHandData:Array;
+		private var rightHandData:Array;
+		
 		
 		public function PatientForm(fieldHeight:int = 45, fieldWidth:int = 400, padding:int=15, bgColor:uint=0xFFFFFF)
 		{
@@ -118,10 +131,28 @@ package ui.elements
 			comments.embedFonts = true;
 			comments.defaultTextFormat = commentFormat;
 			addChild(comments);
+			
+			statusLog = "";
+			
+			leftFootData = new Array();
+			rightFootData = new Array();
+			leftHandData = new Array();
+			rightHandData = new Array();
 		}
 		
 		public function getJSONString():String {
-			return '{"id" : ' + idNumber.text + ', "procedure" : "' + getProcedure() + '", "comments" : "' + comments.text + '"}';
+			var date:Date = new Date();
+			return '{"patient_id" : ' + idNumber.text +
+				   ', "procedure" : "' + getProcedure() +
+				   '", "description" : "' + comments.text +
+				   '", "status_report" : "' + statusLog +
+				   '", "date" : "' + date.toString() +
+				   '", "time_taken" : "' + timeElapsed + 's' +
+				   '", "left_foot_x" : [' + leftFootData.toString() + ']' +
+				   ', "right_foot_x" : [' + rightFootData.toString() + ']' +
+				   ', "left_hand_z" : [' + leftHandData.toString() + ']' +
+				   ', "right_hand_z" : [' + rightHandData.toString() + ']' +
+				   '}';
 		}
 		
 		public function getPatientNumber():String {
@@ -141,10 +172,15 @@ package ui.elements
 			procedure.text = "";
 		}
 		
-		public function clearFields(event:Event):void {
+		public function clearFields(event:Event = null):void {
 			idNumber.text = "";
 			procedure.text = "";
 			comments.text = "";
+			statusLog = "";
+			leftFootData = new Array();
+			rightFootData = new Array();
+			leftHandData = new Array();
+			rightHandData = new Array();
 			procChoice.resetToDefaultBackground();
 		}
 		
@@ -152,6 +188,45 @@ package ui.elements
 			if (event.currentTarget.text != "") {
 				procChoice.resetToDefaultBackground();
 			}
+		}
+		
+		public function appendToLog(log:String):void {
+			statusLog += log;
+		}
+		
+		public function outputToWeb(file:File):void {
+			// Copy default to new directory.
+			var original:File = file.parent.resolvePath("default.html");
+			var newFile:File = file.resolvePath("index.html"); 
+			original.copyTo(newFile, true); 
+			
+			// Create JSON report.
+			file.createDirectory();
+			var exportSettingsFile:File = file.resolvePath("report.json");
+			var settingsFileStream:FileStream = new FileStream();
+			settingsFileStream.open(exportSettingsFile, FileMode.WRITE);
+			settingsFileStream.writeUTFBytes(getJSONString());
+			settingsFileStream.close();
+		}
+		
+		public function setTimeElapsed(time:int):void {
+			timeElapsed = time;
+		}
+		
+		public function addLeftFootData(val:int):void {
+			leftFootData.push(val);
+		}
+		
+		public function addRightFootData(val:int):void {
+			rightFootData.push(val);
+		}
+		
+		public function addLeftHandData(val:int):void {
+			leftHandData.push(val);
+		}
+		
+		public function addRightHandData(val:int):void {
+			rightHandData.push(val);
 		}
 	}
 }
