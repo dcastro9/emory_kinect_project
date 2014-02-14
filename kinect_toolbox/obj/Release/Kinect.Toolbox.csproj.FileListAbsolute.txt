@@ -1,0 +1,11 @@
+C:\Users\qk\Projects\kinect_as3nui_mci_project\kinect_toolbox\bin\Release\Kinect.Toolbox.dll
+C:\Users\qk\Projects\kinect_as3nui_mci_project\kinect_toolbox\bin\Release\Kinect.Toolbox.pdb
+C:\Users\qk\Projects\kinect_as3nui_mci_project\kinect_toolbox\bin\Release\Microsoft.Kinect.Toolkit.FaceTracking.dll
+C:\Users\qk\Projects\kinect_as3nui_mci_project\kinect_toolbox\obj\Release\Controls\PresenceControl.baml
+C:\Users\qk\Projects\kinect_as3nui_mci_project\kinect_toolbox\obj\Release\Controls\MouseImpostor.baml
+C:\Users\qk\Projects\kinect_as3nui_mci_project\kinect_toolbox\obj\Release\Controls\PresenceControl.g.cs
+C:\Users\qk\Projects\kinect_as3nui_mci_project\kinect_toolbox\obj\Release\Controls\MouseImpostor.g.cs
+C:\Users\qk\Projects\kinect_as3nui_mci_project\kinect_toolbox\obj\Release\Kinect.Toolbox_MarkupCompile.cache
+C:\Users\qk\Projects\kinect_as3nui_mci_project\kinect_toolbox\obj\Release\Kinect.Toolbox.g.resources
+C:\Users\qk\Projects\kinect_as3nui_mci_project\kinect_toolbox\obj\Release\Kinect.Toolbox.dll
+C:\Users\qk\Projects\kinect_as3nui_mci_project\kinect_toolbox\obj\Release\Kinect.Toolbox.pdb

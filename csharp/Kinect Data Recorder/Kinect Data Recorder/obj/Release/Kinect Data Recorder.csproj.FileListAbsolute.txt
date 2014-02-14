@@ -1,0 +1,13 @@
+C:\Users\qk\Projects\kinect_as3nui_mci_project\csharp_port\Kinect Data Recorder\Kinect Data Recorder\bin\Release\Kinect Data Recorder.exe.config
+C:\Users\qk\Projects\kinect_as3nui_mci_project\csharp_port\Kinect Data Recorder\Kinect Data Recorder\bin\Release\Kinect Data Recorder.exe
+C:\Users\qk\Projects\kinect_as3nui_mci_project\csharp_port\Kinect Data Recorder\Kinect Data Recorder\bin\Release\Kinect Data Recorder.pdb
+C:\Users\qk\Projects\kinect_as3nui_mci_project\csharp_port\Kinect Data Recorder\Kinect Data Recorder\bin\Release\Kinect.Toolbox.dll
+C:\Users\qk\Projects\kinect_as3nui_mci_project\csharp_port\Kinect Data Recorder\Kinect Data Recorder\obj\Release\MainWindow.baml
+C:\Users\qk\Projects\kinect_as3nui_mci_project\csharp_port\Kinect Data Recorder\Kinect Data Recorder\obj\Release\MainWindow.g.cs
+C:\Users\qk\Projects\kinect_as3nui_mci_project\csharp_port\Kinect Data Recorder\Kinect Data Recorder\obj\Release\App.g.cs
+C:\Users\qk\Projects\kinect_as3nui_mci_project\csharp_port\Kinect Data Recorder\Kinect Data Recorder\obj\Release\Kinect Data Recorder_MarkupCompile.cache
+C:\Users\qk\Projects\kinect_as3nui_mci_project\csharp_port\Kinect Data Recorder\Kinect Data Recorder\obj\Release\Kinect Data Recorder.g.resources
+C:\Users\qk\Projects\kinect_as3nui_mci_project\csharp_port\Kinect Data Recorder\Kinect Data Recorder\obj\Release\Kinect_Data_Recorder.Properties.Resources.resources
+C:\Users\qk\Projects\kinect_as3nui_mci_project\csharp_port\Kinect Data Recorder\Kinect Data Recorder\obj\Release\Kinect Data Recorder.csproj.GenerateResource.Cache
+C:\Users\qk\Projects\kinect_as3nui_mci_project\csharp_port\Kinect Data Recorder\Kinect Data Recorder\obj\Release\Kinect Data Recorder.exe
+C:\Users\qk\Projects\kinect_as3nui_mci_project\csharp_port\Kinect Data Recorder\Kinect Data Recorder\obj\Release\Kinect Data Recorder.pdb

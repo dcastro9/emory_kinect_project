@@ -1,0 +1,16 @@
+C:\Users\qk\Projects\kinect_as3nui_mci_project\kinect_toolbox\KinectUI\bin\Release\KinectUI.exe.config
+C:\Users\qk\Projects\kinect_as3nui_mci_project\kinect_toolbox\KinectUI\bin\Release\KinectUI.exe
+C:\Users\qk\Projects\kinect_as3nui_mci_project\kinect_toolbox\KinectUI\bin\Release\KinectUI.pdb
+C:\Users\qk\Projects\kinect_as3nui_mci_project\kinect_toolbox\KinectUI\bin\Release\Kinect.Toolbox.dll
+C:\Users\qk\Projects\kinect_as3nui_mci_project\kinect_toolbox\KinectUI\bin\Release\Microsoft.Kinect.Toolkit.FaceTracking.dll
+C:\Users\qk\Projects\kinect_as3nui_mci_project\kinect_toolbox\KinectUI\bin\Release\Kinect.Toolbox.pdb
+C:\Users\qk\Projects\kinect_as3nui_mci_project\kinect_toolbox\KinectUI\obj\Release\KinectUI.csprojResolveAssemblyReference.cache
+C:\Users\qk\Projects\kinect_as3nui_mci_project\kinect_toolbox\KinectUI\obj\Release\MainWindow.baml
+C:\Users\qk\Projects\kinect_as3nui_mci_project\kinect_toolbox\KinectUI\obj\Release\MainWindow.g.cs
+C:\Users\qk\Projects\kinect_as3nui_mci_project\kinect_toolbox\KinectUI\obj\Release\App.g.cs
+C:\Users\qk\Projects\kinect_as3nui_mci_project\kinect_toolbox\KinectUI\obj\Release\KinectUI_MarkupCompile.cache
+C:\Users\qk\Projects\kinect_as3nui_mci_project\kinect_toolbox\KinectUI\obj\Release\KinectUI.g.resources
+C:\Users\qk\Projects\kinect_as3nui_mci_project\kinect_toolbox\KinectUI\obj\Release\KinectUI.Properties.Resources.resources
+C:\Users\qk\Projects\kinect_as3nui_mci_project\kinect_toolbox\KinectUI\obj\Release\KinectUI.csproj.GenerateResource.Cache
+C:\Users\qk\Projects\kinect_as3nui_mci_project\kinect_toolbox\KinectUI\obj\Release\KinectUI.exe
+C:\Users\qk\Projects\kinect_as3nui_mci_project\kinect_toolbox\KinectUI\obj\Release\KinectUI.pdb

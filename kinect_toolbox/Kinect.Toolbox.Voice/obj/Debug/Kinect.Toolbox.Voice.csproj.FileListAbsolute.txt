@@ -1,0 +1,5 @@
+C:\Users\qk\Projects\kinect_as3nui_mci_project\kinect_toolbox\Kinect.Toolbox.Voice\bin\Debug\Kinect.Toolbox.Voice.dll
+C:\Users\qk\Projects\kinect_as3nui_mci_project\kinect_toolbox\Kinect.Toolbox.Voice\bin\Debug\Kinect.Toolbox.Voice.pdb
+C:\Users\qk\Projects\kinect_as3nui_mci_project\kinect_toolbox\Kinect.Toolbox.Voice\obj\Debug\Kinect.Toolbox.Voice.csprojResolveAssemblyReference.cache
+C:\Users\qk\Projects\kinect_as3nui_mci_project\kinect_toolbox\Kinect.Toolbox.Voice\obj\Debug\Kinect.Toolbox.Voice.dll
+C:\Users\qk\Projects\kinect_as3nui_mci_project\kinect_toolbox\Kinect.Toolbox.Voice\obj\Debug\Kinect.Toolbox.Voice.pdb

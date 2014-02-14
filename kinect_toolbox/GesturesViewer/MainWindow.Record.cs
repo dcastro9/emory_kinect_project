@@ -26,7 +26,7 @@ namespace GesturesViewer
         void DirectRecord(string targetFileName)
         {
             Stream recordStream = File.Create(targetFileName);
-            recorder = new KinectRecorder(KinectRecordOptions.Skeletons | KinectRecordOptions.Color, recordStream);
+            recorder = new KinectRecorder(KinectRecordOptions.Skeletons | KinectRecordOptions.Color | KinectRecordOptions.Depth, recordStream);
             recordOption.Content = "Stop Recording";
         }
 
