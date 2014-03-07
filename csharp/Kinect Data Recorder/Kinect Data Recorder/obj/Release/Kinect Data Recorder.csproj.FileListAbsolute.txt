@@ -11,3 +11,6 @@ C:\Users\qk\Projects\kinect_as3nui_mci_project\csharp_port\Kinect Data Recorder\
 C:\Users\qk\Projects\kinect_as3nui_mci_project\csharp_port\Kinect Data Recorder\Kinect Data Recorder\obj\Release\Kinect Data Recorder.csproj.GenerateResource.Cache
 C:\Users\qk\Projects\kinect_as3nui_mci_project\csharp_port\Kinect Data Recorder\Kinect Data Recorder\obj\Release\Kinect Data Recorder.exe
 C:\Users\qk\Projects\kinect_as3nui_mci_project\csharp_port\Kinect Data Recorder\Kinect Data Recorder\obj\Release\Kinect Data Recorder.pdb
+C:\Users\Michael\Documents\GitHub\kinect_as3nui_mci_project\csharp\Kinect Data Recorder\Kinect Data Recorder\bin\Release\Kinect Data Recorder.exe.config
+C:\Users\Michael\Documents\GitHub\kinect_as3nui_mci_project\csharp\Kinect Data Recorder\Kinect Data Recorder\obj\Release\Kinect Data Recorder.exe
+C:\Users\Michael\Documents\GitHub\kinect_as3nui_mci_project\csharp\Kinect Data Recorder\Kinect Data Recorder\obj\Release\Kinect Data Recorder.pdb

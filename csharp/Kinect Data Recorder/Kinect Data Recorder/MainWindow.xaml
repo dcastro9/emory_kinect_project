@@ -26,12 +26,16 @@
             <TextBox x:Name="Patient_ID" HorizontalAlignment="Left" Margin="215,195,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Background="#FFDDDDDD" Width="290" Height="58" FontSize="24" FontFamily="HelveNueThin" Padding="20,12,20,10"/>
             <TextBox x:Name="Procedure" HorizontalAlignment="Left" Margin="215,263,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Background="#FFDDDDDD" Width="290" Height="58" FontSize="24" FontFamily="HelveNueThin" Padding="20,12,20,10"/>
             <TextBox x:Name="Details" HorizontalAlignment="Left" Margin="215,332,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Background="#FFDDDDDD" Width="290" Height="190" FontSize="21.333" FontFamily="HelveNueThin" Padding="20,12,20,10" AcceptsReturn="True"/>
-            <Image x:Name="Record_Button" Source="Assets/record_button.jpg" Width="250" Height="65" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,5,90" />
+            <Button x:Name="Record_Button" Click ="recordOption_Click" Width="250" Height="65" BorderBrush="{x:Null}" BorderThickness="0" Padding="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,5,90">
+                <Image Source="Assets/record_button.jpg" Width="250" Height="65"></Image>
+            </Button>
         </Grid>
         <Grid x:Name="Feedback_Display" Height="714" Width="806" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="560,54,0,0">
             <Grid x:Name="Kinect_Video_Feed" Height="340" Width="735" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,0,0">
                 <TextBlock x:Name="Kinect_Video_Label" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Kinect Video Feed" VerticalAlignment="Top" FontFamily="HelveNueThin" FontSize="40" Foreground="#FF5133AB" Margin="0,30,0,0"/>
-                <Image x:Name="Toggle_Button" Source="Assets/toggle_button.jpg" Width="132" Height="38" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,38,5,90" />
+                <Button x:Name="Toggle_Button" Click ="Button_Click" Width="132" Height="38" BorderBrush="{x:Null}" BorderThickness="0" Padding="0" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,38,5,90">
+                    <Image Source="Assets/toggle_button.jpg" Width="132" Height="38"></Image>
+                </Button>
                 <Grid Width="320" Height="240" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="30,0,0,0">
                     <Image x:Name="kinectDisplay1" Source="{Binding Bitmap}"/>
                     <Canvas x:Name="kinectCanvas1"/>

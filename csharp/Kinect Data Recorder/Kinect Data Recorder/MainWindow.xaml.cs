@@ -15,6 +15,8 @@ using System.Windows.Shapes;
 using Microsoft.Kinect;
 using Kinect.Toolbox;
 using Kinect.Toolbox.Record;
+using System.IO;
+using Microsoft.Win32;
 
 namespace Kinect_Data_Recorder
 {
@@ -23,12 +25,14 @@ namespace Kinect_Data_Recorder
     /// </summary>
     public partial class MainWindow
     {
-        KinectSensor kinectSensor;
+        KinectSensor[] kinectSensors = new KinectSensor[2];
+        Canvas[] canvases = new Canvas[2];
+        Dictionary<string, Image> displays = new Dictionary<string, Image>(2);
 
-        readonly ColorStreamManager colorManager = new ColorStreamManager();
-        readonly DepthStreamManager depthManager = new DepthStreamManager();
+        Dictionary<string, ColorStreamManager> colorManagers = new Dictionary<string, ColorStreamManager>(2);
+        Dictionary<string, DepthStreamManager> depthManagers = new Dictionary<string, DepthStreamManager>(2);
+        Dictionary<string, SkeletonDisplayManager> skeletonDisplayManagers = new Dictionary<string, SkeletonDisplayManager>(2);
 
-        SkeletonDisplayManager skeletonDisplayManager;
         readonly ContextTracker contextTracker = new ContextTracker();
 
         private bool recordNextFrameForPosture;
@@ -37,35 +41,33 @@ namespace Kinect_Data_Recorder
         KinectRecorder recorder;
         KinectReplay replay;
 
-        BindableNUICamera nuiCamera;
-
         private Skeleton[] skeletons;
 
         void Kinects_StatusChanged(object sender, StatusChangedEventArgs e)
         {
             switch (e.Status)
             {
-                case KinectStatus.Connected:
-                    if (kinectSensor == null)
-                    {
-                        kinectSensor = e.Sensor;
-                        Initialize();
-                    }
-                    break;
+                //case KinectStatus.Connected:
+                //    if (kinectSensor == null)
+                //    {
+                //        kinectSensor = e.Sensor;
+                //        Initialize();
+                //    }
+                //    break;
                 case KinectStatus.Disconnected:
-                    if (kinectSensor == e.Sensor)
+                    if (kinectSensors[0] == e.Sensor || kinectSensors[1] == e.Sensor)
                     {
-                        Clean();
+                        Clean(e.Sensor);
                         MessageBox.Show("Kinect was disconnected");
                     }
                     break;
                 case KinectStatus.NotReady:
                     break;
                 case KinectStatus.NotPowered:
-                    if (kinectSensor == e.Sensor)
+                    if (kinectSensors[0] == e.Sensor || kinectSensors[1] == e.Sensor)
                     {
-                        Clean();
-                        MessageBox.Show("Kinect is no more powered");
+                        Clean(e.Sensor);
+                        MessageBox.Show("Kinect is no longer powered");
                     }
                     break;
                 default:
@@ -86,13 +88,35 @@ namespace Kinect_Data_Recorder
                 {
                     if (kinect.Status == KinectStatus.Connected)
                     {
-                        kinectSensor = kinect;
-                        break;
+                        if (kinectSensors[0] == null)
+                        {
+                            kinectSensors[0] = kinect;
+                            string id = kinect.DeviceConnectionId;
+                            canvases[0] = kinectCanvas1;
+                            displays.Add(id, kinectDisplay1);
+                            colorManagers.Add(id, new ColorStreamManager());
+                            depthManagers.Add(id, new DepthStreamManager());
+                        }
+                        else if (kinectSensors[1] == null)
+                        {
+                            kinectSensors[1] = kinect;
+                            string id = kinect.DeviceConnectionId;
+                            canvases[1] = kinectCanvas2;
+                            displays.Add(id, kinectDisplay2);
+                            colorManagers.Add(id, new ColorStreamManager());
+                            depthManagers.Add(id, new DepthStreamManager());
+                            break;
+                        }
                     }
                 }
 
                 if (KinectSensor.KinectSensors.Count == 0)
-                    MessageBox.Show("No Kinect found");
+                    MessageBox.Show("No Kinect found. Please connect one.");
+                else if (KinectSensor.KinectSensors.Count == 1)
+                {
+                    MessageBox.Show("Only one kinect connected. Please connect another");
+                    Initialize();
+                }
                 else
                     Initialize();
 
@@ -105,33 +129,38 @@ namespace Kinect_Data_Recorder
 
         private void Initialize()
         {
-            if (kinectSensor == null)
-                return;
-
-
-            kinectSensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
-            kinectSensor.ColorFrameReady += kinectRuntime_ColorFrameReady;
-
-            kinectSensor.DepthStream.Enable(DepthImageFormat.Resolution320x240Fps30);
-            kinectSensor.DepthFrameReady += kinectSensor_DepthFrameReady;
-
-            kinectSensor.SkeletonStream.Enable(new TransformSmoothParameters
+            for (int i = 0; i < kinectSensors.Length; i++)
             {
-                Smoothing = 0.5f,
-                Correction = 0.5f,
-                Prediction = 0.5f,
-                JitterRadius = 0.05f,
-                MaxDeviationRadius = 0.04f
-            });
-            kinectSensor.SkeletonFrameReady += kinectRuntime_SkeletonFrameReady;
 
-            skeletonDisplayManager = new SkeletonDisplayManager(kinectSensor, kinectCanvas1);
+                if (kinectSensors[i] == null)
+                    return;
 
-            kinectSensor.Start();
 
-            nuiCamera = new BindableNUICamera(kinectSensor);
+                kinectSensors[i].ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
+                kinectSensors[i].ColorFrameReady += kinectRuntime_ColorFrameReady;
 
-            kinectDisplay1.DataContext = colorManager;
+                kinectSensors[i].DepthStream.Enable(DepthImageFormat.Resolution320x240Fps30);
+                kinectSensors[i].DepthFrameReady += kinectSensor_DepthFrameReady;
+
+                kinectSensors[i].SkeletonStream.Enable(new TransformSmoothParameters
+                {
+                    Smoothing = 0.5f,
+                    Correction = 0.5f,
+                    Prediction = 0.5f,
+                    JitterRadius = 0.05f,
+                    MaxDeviationRadius = 0.04f
+                });
+
+                kinectSensors[i].SkeletonFrameReady += kinectRuntime_SkeletonFrameReady;
+
+                string id = kinectSensors[i].DeviceConnectionId;
+                skeletonDisplayManagers[id] = new SkeletonDisplayManager(kinectSensors[i], canvases[i]);
+
+                kinectSensors[i].Start();
+
+                
+                displays[id].DataContext = colorManagers[id];
+            }
         }
 
         void kinectSensor_DepthFrameReady(object sender, DepthImageFrameReadyEventArgs e)
@@ -152,7 +181,7 @@ namespace Kinect_Data_Recorder
                 if (!displayDepth)
                     return;
 
-                depthManager.Update(frame);
+                depthManagers[((KinectSensor) sender).DeviceConnectionId].Update(frame);
             }
         }
 
@@ -174,7 +203,7 @@ namespace Kinect_Data_Recorder
                 if (displayDepth)
                     return;
 
-                colorManager.Update(frame);
+                colorManagers[((KinectSensor)sender).DeviceConnectionId].Update(frame);
             }
         }
 
@@ -196,11 +225,11 @@ namespace Kinect_Data_Recorder
                 if (skeletons.All(s => s.TrackingState == SkeletonTrackingState.NotTracked))
                     return;
 
-                ProcessFrame(frame);
+                ProcessFrame(frame, sender);
             }
         }
 
-        void ProcessFrame(ReplaySkeletonFrame frame)
+        void ProcessFrame(ReplaySkeletonFrame frame, object sender)
         {
             Dictionary<int, string> stabilities = new Dictionary<int, string>();
             foreach (var skeleton in frame.Skeletons)
@@ -219,15 +248,39 @@ namespace Kinect_Data_Recorder
                 }
             }
 
-            skeletonDisplayManager.Draw(frame.Skeletons, false);
+            skeletonDisplayManagers[((KinectSensor) sender).DeviceConnectionId].Draw(frame.Skeletons, false);
+        }
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            displayDepth = !displayDepth;
+
+            if (displayDepth)
+            {
+                foreach (KinectSensor kinect in kinectSensors)
+                {
+                    string id = kinect.DeviceConnectionId;
+                    displays[id].DataContext = depthManagers[id];
+                }
+            }
+            else
+            {
+                foreach (KinectSensor kinect in kinectSensors)
+                {
+                    string id = kinect.DeviceConnectionId;
+                    displays[id].DataContext = colorManagers[id];
+                }
+            }
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            Clean();
+            foreach (KinectSensor kinectSensor in kinectSensors)
+            {
+                Clean(kinectSensor);
+            }
         }
 
-        private void Clean()
+        private void Clean(KinectSensor kinectSensor)
         {
             if (recorder != null)
             {
@@ -242,6 +295,38 @@ namespace Kinect_Data_Recorder
                 kinectSensor.ColorFrameReady -= kinectRuntime_ColorFrameReady;
                 kinectSensor.Stop();
                 kinectSensor = null;
+            }
+        }
+
+        private void recordOption_Click(object sender, RoutedEventArgs e)
+        {
+            if (recorder != null)
+            {
+                StopRecord();
+                return;
+            }
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog { Title = "Select filename", Filter = "Replay files|*.replay" };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                DirectRecord(saveFileDialog.FileName);
+            }
+        }
+
+        void DirectRecord(string targetFileName)
+        {
+            Stream recordStream = File.Create(targetFileName);
+            recorder = new KinectRecorder(KinectRecordOptions.Skeletons | KinectRecordOptions.Depth, recordStream);
+        }
+
+        void StopRecord()
+        {
+            if (recorder != null)
+            {
+                recorder.Stop();
+                recorder = null;
+                return;
             }
         }
 

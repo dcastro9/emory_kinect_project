@@ -103,7 +103,7 @@ namespace GesturesViewer
                 }
 
                 if (KinectSensor.KinectSensors.Count == 0)
-                    MessageBox.Show("No Kinect found");
+                    MessageBox.Show("No Kinect found. Please attach a Kinect");
                 else
                     Initialize();
 

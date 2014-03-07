@@ -12,3 +12,17 @@ C:\Users\qk\Projects\kinect_as3nui_mci_project\csharp_port\Kinect Data Recorder\
 C:\Users\qk\Projects\kinect_as3nui_mci_project\csharp_port\Kinect Data Recorder\Kinect Data Recorder\obj\Debug\Kinect Data Recorder.csproj.GenerateResource.Cache
 C:\Users\qk\Projects\kinect_as3nui_mci_project\csharp_port\Kinect Data Recorder\Kinect Data Recorder\obj\Debug\Kinect Data Recorder.exe
 C:\Users\qk\Projects\kinect_as3nui_mci_project\csharp_port\Kinect Data Recorder\Kinect Data Recorder\obj\Debug\Kinect Data Recorder.pdb
+C:\Users\Michael\Documents\GitHub\kinect_as3nui_mci_project\csharp\Kinect Data Recorder\Kinect Data Recorder\bin\Debug\Kinect Data Recorder.exe.config
+C:\Users\Michael\Documents\GitHub\kinect_as3nui_mci_project\csharp\Kinect Data Recorder\Kinect Data Recorder\obj\Debug\Kinect Data Recorder.exe
+C:\Users\Michael\Documents\GitHub\kinect_as3nui_mci_project\csharp\Kinect Data Recorder\Kinect Data Recorder\obj\Debug\Kinect Data Recorder.pdb
+C:\Users\Michael\Documents\GitHub\kinect_as3nui_mci_project\csharp\Kinect Data Recorder\Kinect Data Recorder\bin\Debug\Kinect Data Recorder.exe
+C:\Users\Michael\Documents\GitHub\kinect_as3nui_mci_project\csharp\Kinect Data Recorder\Kinect Data Recorder\bin\Debug\Kinect Data Recorder.pdb
+C:\Users\Michael\Documents\GitHub\kinect_as3nui_mci_project\csharp\Kinect Data Recorder\Kinect Data Recorder\bin\Debug\Kinect.Toolbox.dll
+C:\Users\Michael\Documents\GitHub\kinect_as3nui_mci_project\csharp\Kinect Data Recorder\Kinect Data Recorder\obj\Debug\Kinect Data Recorder.csprojResolveAssemblyReference.cache
+C:\Users\Michael\Documents\GitHub\kinect_as3nui_mci_project\csharp\Kinect Data Recorder\Kinect Data Recorder\obj\Debug\MainWindow.baml
+C:\Users\Michael\Documents\GitHub\kinect_as3nui_mci_project\csharp\Kinect Data Recorder\Kinect Data Recorder\obj\Debug\MainWindow.g.cs
+C:\Users\Michael\Documents\GitHub\kinect_as3nui_mci_project\csharp\Kinect Data Recorder\Kinect Data Recorder\obj\Debug\App.g.cs
+C:\Users\Michael\Documents\GitHub\kinect_as3nui_mci_project\csharp\Kinect Data Recorder\Kinect Data Recorder\obj\Debug\Kinect Data Recorder_MarkupCompile.cache
+C:\Users\Michael\Documents\GitHub\kinect_as3nui_mci_project\csharp\Kinect Data Recorder\Kinect Data Recorder\obj\Debug\Kinect Data Recorder.g.resources
+C:\Users\Michael\Documents\GitHub\kinect_as3nui_mci_project\csharp\Kinect Data Recorder\Kinect Data Recorder\obj\Debug\Kinect_Data_Recorder.Properties.Resources.resources
+C:\Users\Michael\Documents\GitHub\kinect_as3nui_mci_project\csharp\Kinect Data Recorder\Kinect Data Recorder\obj\Debug\Kinect Data Recorder.csproj.GenerateResource.Cache
