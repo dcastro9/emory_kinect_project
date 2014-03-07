@@ -22,7 +22,7 @@ package ui.elements
 			headerText.embedFonts = true;
 			headerText.defaultTextFormat = textFormat;
 			headerText.text = text;
-			headerText.x = 60;
+			headerText.x = 10;
 			headerText.y = 8;
 			headerText.textColor = 0x000000;
 			headerText.width = width;
