@@ -177,10 +177,15 @@ namespace Kinect_Data_Recorder
                 if (frame == null)
                     return;
                 string id = ((KinectSensor)sender).DeviceConnectionId;
-                KinectRecorder recorder = recorders[id];
-                if (recorder != null && ((recorder.Options & KinectRecordOptions.Depth) != 0))
+                
+                if (recorders != null)
                 {
-                    recorder.Record(frame);
+                    KinectRecorder recorder = recorders[id];
+                    if ((recorder.Options & KinectRecordOptions.Depth) != 0)
+                    {
+                        recorder.Record(frame);
+                    }
+                    
                 }
 
                 if (!displayDepth)
@@ -200,10 +205,14 @@ namespace Kinect_Data_Recorder
                 if (frame == null)
                     return;
                 string id = ((KinectSensor)sender).DeviceConnectionId;
-                KinectRecorder recorder = recorders[id];
-                if (recorder != null && ((recorder.Options & KinectRecordOptions.Color) != 0))
+                
+                if (recorders != null)
                 {
-                    recorder.Record(frame);
+                    KinectRecorder recorder = recorders[id];
+                    if ((recorder.Options & KinectRecordOptions.Color) != 0){
+                        recorder.Record(frame);
+                    }
+                    
                 }
 
                 if (displayDepth)
@@ -223,9 +232,15 @@ namespace Kinect_Data_Recorder
                 if (frame == null)
                     return;
                 string id = ((KinectSensor)sender).DeviceConnectionId;
-                KinectRecorder recorder = recorders[id];
-                if (recorder != null && ((recorder.Options & KinectRecordOptions.Skeletons) != 0))
-                    recorder.Record(frame);
+                
+                if (recorders != null)
+                {
+                    KinectRecorder recorder = recorders[id];
+                    if ((recorder.Options & KinectRecordOptions.Skeletons) != 0){
+                        recorder.Record(frame);
+                    }
+                }
+                    
 
                 frame.GetSkeletons(ref skeletons);
 
