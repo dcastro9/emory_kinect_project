@@ -178,7 +178,7 @@ namespace Kinect_Data_Recorder
                     return;
                 string id = ((KinectSensor)sender).DeviceConnectionId;
                 
-                if (recorders != null)
+                if (recorders.Count > 1)
                 {
                     KinectRecorder recorder = recorders[id];
                     if ((recorder.Options & KinectRecordOptions.Depth) != 0)
@@ -206,7 +206,7 @@ namespace Kinect_Data_Recorder
                     return;
                 string id = ((KinectSensor)sender).DeviceConnectionId;
                 
-                if (recorders != null)
+                if (recorders.Count > 1)
                 {
                     KinectRecorder recorder = recorders[id];
                     if ((recorder.Options & KinectRecordOptions.Color) != 0){
@@ -233,7 +233,7 @@ namespace Kinect_Data_Recorder
                     return;
                 string id = ((KinectSensor)sender).DeviceConnectionId;
                 
-                if (recorders != null)
+                if (recorders.Count> 1)
                 {
                     KinectRecorder recorder = recorders[id];
                     if ((recorder.Options & KinectRecordOptions.Skeletons) != 0){
@@ -305,13 +305,14 @@ namespace Kinect_Data_Recorder
         private void Clean(KinectSensor kinectSensor)
         {
             string id = kinectSensor.DeviceConnectionId;
-            KinectRecorder recorder = recorders[id];
-            if (recorder != null)
-            {
-                recorder.Stop();
-                recorder = null;
+            if (recorders.Count == 2 ){
+                KinectRecorder recorder = recorders[id];
+                if (recorder != null)
+                {
+                    recorder.Stop();
+                    recorder = null;
+                }
             }
-
             if (kinectSensor != null)
             {
                 kinectSensor.DepthFrameReady -= kinectSensor_DepthFrameReady;
@@ -371,16 +372,18 @@ namespace Kinect_Data_Recorder
                 return;
             }
             SaveFileDialog saveFileDialog = new SaveFileDialog { Title = "Select filename", Filter = "Replay files|*.replay" };
-            timerInit();
-            for (int i = 0; i < kinectSensors.Length; i++)
+             
+            if (saveFileDialog.ShowDialog() == true)
             {
-                if (saveFileDialog.ShowDialog() == true)
+                timerInit();
+                for (int i = 0; i < kinectSensors.Length; i++)
                 {
+
                     string file = saveFileDialog.FileName;
                     string kinectID = kinectSensors[i].DeviceConnectionId;
                     DirectRecord(file + "Kinect" + i.ToString(), kinectID);
                 }
-            }
+            }  
         }
 
         void DirectRecord(string targetFileName, string id)
@@ -391,14 +394,17 @@ namespace Kinect_Data_Recorder
 
         void StopRecord()
         {
-            if (recorders != null)
+            if (recorders !=null)
             {
-                foreach (string id in recorders.Keys)
+                string[] keys = recorders.Keys.ToArray();
+                for (int i = 0; i < recorders.Keys.Count;i++ )
                 {
+                    string id = keys[i];
                     recorders[id].Stop();
-                    recorders[id] = null;
-                    return;
+                    recorders.Remove(id);
                 }
+
+                return;
             }
         }
 
