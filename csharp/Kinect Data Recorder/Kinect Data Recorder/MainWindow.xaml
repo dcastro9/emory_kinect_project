@@ -19,7 +19,7 @@
         </Grid>
         <Grid x:Name="Patient_Form" Height="714" Width="510" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,54,0,0">
             <TextBlock x:Name="Form_Header" HorizontalAlignment="Center" TextWrapping="Wrap" Text="Patient Details" VerticalAlignment="Top" FontFamily="HelveNueThin" FontSize="56" Foreground="#FF5133AB" Margin="0,30,0,0"/>
-            <TextBlock x:Name="Form_Desc" HorizontalAlignment="Center" TextWrapping="Wrap" Text="Please fill out the details below to the best of your ability!" VerticalAlignment="Top" FontFamily="HelveNueThin" FontSize="32" Foreground="#FF2D2D30" Margin="0,100,0,0" Width="420"/>
+            <TextBlock x:Name="Form_Desc" HorizontalAlignment="Center" TextWrapping="Wrap" Text="Please fill out the details below to the best of your ability!" VerticalAlignment="Top" FontFamily="HelveNueThin" FontSize="32" Foreground="#FF2D2D30" Margin="45,100,10,0" Width="455"/>
             <TextBlock x:Name="Patient_ID_Label" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Patient ID" VerticalAlignment="Top" FontFamily="HelveNueThin" FontSize="32" Foreground="#FF5133AB" Margin="0,205,0,0" Padding="25,0,0,0" TextAlignment="Right" Width="190"/>
             <TextBlock x:Name="Procedure_Label" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Procedure" VerticalAlignment="Top" FontFamily="HelveNueThin" FontSize="32" Foreground="#FF5133AB" Margin="0,273,0,0" Padding="25,0,0,0" TextAlignment="Right" Width="190"/>
             <TextBlock x:Name="Details_Label" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Details" VerticalAlignment="Top" FontFamily="HelveNueThin" FontSize="32" Foreground="#FF5133AB" Margin="0,335,0,0" Padding="25,0,0,0" TextAlignment="Right" Width="190"/>
@@ -29,6 +29,7 @@
             <Button x:Name="Record_Button" Click ="recordOption_Click" Width="250" Height="65" BorderBrush="{x:Null}" BorderThickness="0" Padding="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,5,90">
                 <Image Source="Assets/record_button.jpg" Width="250" Height="65"></Image>
             </Button>
+            <TextBlock x:Name="TimerLabel" HorizontalAlignment="Right" Margin="0,629,0,0" TextWrapping="Wrap" Text="00:00" VerticalAlignment="Top" Height="57" Width="90" FontSize="35"/>
         </Grid>
         <Grid x:Name="Feedback_Display" Height="714" Width="806" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="560,54,0,0">
             <Grid x:Name="Kinect_Video_Feed" Height="340" Width="735" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,0,0">

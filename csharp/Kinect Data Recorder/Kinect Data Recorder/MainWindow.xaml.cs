@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Timers;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -38,7 +40,7 @@ namespace Kinect_Data_Recorder
         private bool recordNextFrameForPosture;
         bool displayDepth;
 
-        KinectRecorder recorder;
+        Dictionary<string, KinectRecorder> recorders = new Dictionary<string,KinectRecorder>(2);
         KinectReplay replay;
 
         private Skeleton[] skeletons;
@@ -75,6 +77,8 @@ namespace Kinect_Data_Recorder
                     break;
             }
         }
+
+    
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -172,7 +176,8 @@ namespace Kinect_Data_Recorder
             {
                 if (frame == null)
                     return;
-
+                string id = ((KinectSensor)sender).DeviceConnectionId;
+                KinectRecorder recorder = recorders[id];
                 if (recorder != null && ((recorder.Options & KinectRecordOptions.Depth) != 0))
                 {
                     recorder.Record(frame);
@@ -181,7 +186,7 @@ namespace Kinect_Data_Recorder
                 if (!displayDepth)
                     return;
 
-                depthManagers[((KinectSensor) sender).DeviceConnectionId].Update(frame);
+                depthManagers[id].Update(frame);
             }
         }
 
@@ -194,7 +199,8 @@ namespace Kinect_Data_Recorder
             {
                 if (frame == null)
                     return;
-
+                string id = ((KinectSensor)sender).DeviceConnectionId;
+                KinectRecorder recorder = recorders[id];
                 if (recorder != null && ((recorder.Options & KinectRecordOptions.Color) != 0))
                 {
                     recorder.Record(frame);
@@ -203,7 +209,7 @@ namespace Kinect_Data_Recorder
                 if (displayDepth)
                     return;
 
-                colorManagers[((KinectSensor)sender).DeviceConnectionId].Update(frame);
+                colorManagers[id].Update(frame);
             }
         }
 
@@ -216,7 +222,8 @@ namespace Kinect_Data_Recorder
             {
                 if (frame == null)
                     return;
-
+                string id = ((KinectSensor)sender).DeviceConnectionId;
+                KinectRecorder recorder = recorders[id];
                 if (recorder != null && ((recorder.Options & KinectRecordOptions.Skeletons) != 0))
                     recorder.Record(frame);
 
@@ -282,6 +289,8 @@ namespace Kinect_Data_Recorder
 
         private void Clean(KinectSensor kinectSensor)
         {
+            string id = kinectSensor.DeviceConnectionId;
+            KinectRecorder recorder = recorders[id];
             if (recorder != null)
             {
                 recorder.Stop();
@@ -298,35 +307,83 @@ namespace Kinect_Data_Recorder
             }
         }
 
+        private DispatcherTimer timer;
+        private void timerInit()
+        {
+            timer = new DispatcherTimer(new TimeSpan(0, 0, 1), DispatcherPriority.Normal, delegate
+            {
+
+                string label = TimerLabel.Text;
+                int min = Int32.Parse(label.Substring(0,2));
+                int sec = Int32.Parse(label.Substring(3));
+                sec++;
+                if (sec >= 60)
+                {
+                    sec = 0;
+                    min++;
+                }
+                string minS = min.ToString();
+                string secS = sec.ToString();
+                if (sec < 10)
+                {
+                    secS = "0" + secS;
+                }
+                if (min < 10)
+                {
+                    minS = "0" + minS;
+                }
+                string result = minS + ":" + secS;
+                TimerLabel.Text = result;
+
+            }, this.Dispatcher);
+            timer.Start();
+        }
+
+        private void StopTimer()
+        {
+            timer.Stop();
+            TimerLabel.Text = "00:00";
+        }
+
+        private bool clicked = false;
         private void recordOption_Click(object sender, RoutedEventArgs e)
         {
-            if (recorder != null)
+            clicked = !clicked;
+            if (!clicked)
             {
                 StopRecord();
+                StopTimer();
                 return;
             }
-
+            timerInit();
             SaveFileDialog saveFileDialog = new SaveFileDialog { Title = "Select filename", Filter = "Replay files|*.replay" };
-
-            if (saveFileDialog.ShowDialog() == true)
+            for (int i = 0; i < kinectSensors.Length; i++)
             {
-                DirectRecord(saveFileDialog.FileName);
+                if (saveFileDialog.ShowDialog() == true)
+                {
+                    string file = saveFileDialog.FileName;
+                    string kinectID = kinectSensors[i].DeviceConnectionId;
+                    DirectRecord(file + "Kinect" + i.ToString(), kinectID);
+                }
             }
         }
 
-        void DirectRecord(string targetFileName)
+        void DirectRecord(string targetFileName, string id)
         {
             Stream recordStream = File.Create(targetFileName);
-            recorder = new KinectRecorder(KinectRecordOptions.Skeletons | KinectRecordOptions.Depth, recordStream);
+            recorders.Add(id, new KinectRecorder(KinectRecordOptions.Skeletons | KinectRecordOptions.Depth, recordStream));
         }
 
         void StopRecord()
         {
-            if (recorder != null)
+            if (recorders != null)
             {
-                recorder.Stop();
-                recorder = null;
-                return;
+                foreach (string id in recorders.Keys)
+                {
+                    recorders[id].Stop();
+                    recorders[id] = null;
+                    return;
+                }
             }
         }
 
