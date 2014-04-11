@@ -355,8 +355,8 @@ namespace Kinect_Data_Recorder
                 StopTimer();
                 return;
             }
-            timerInit();
             SaveFileDialog saveFileDialog = new SaveFileDialog { Title = "Select filename", Filter = "Replay files|*.replay" };
+            timerInit();
             for (int i = 0; i < kinectSensors.Length; i++)
             {
                 if (saveFileDialog.ShowDialog() == true)
