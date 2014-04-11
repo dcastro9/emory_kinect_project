@@ -1,5 +1,7 @@
 package ui.elements
 {	
+	import com.as3nui.nativeExtensions.air.kinect.data.SkeletonJoint;
+	
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.filesystem.File;
@@ -34,6 +36,7 @@ package ui.elements
 		private var rightFootData:Array;
 		private var leftHandData:Array;
 		private var rightHandData:Array;
+		private var skeletonData:Array;
 		
 		
 		public function PatientForm(fieldHeight:int = 45, fieldWidth:int = 400, padding:int=15, bgColor:uint=0xFFFFFF)
@@ -138,6 +141,7 @@ package ui.elements
 			rightFootData = new Array();
 			leftHandData = new Array();
 			rightHandData = new Array();
+			skeletonData = new Array();
 		}
 		
 		public function getJSONString():String {
@@ -152,6 +156,7 @@ package ui.elements
 				   ', "right_foot_x" : [' + rightFootData.toString() + ']' +
 				   ', "left_hand_z" : [' + leftHandData.toString() + ']' +
 				   ', "right_hand_z" : [' + rightHandData.toString() + ']' +
+				   ', "skeleton_array" : [' + skeletonData.toString() + ']' +
 				   '}';
 		}
 		
@@ -181,6 +186,7 @@ package ui.elements
 			rightFootData = new Array();
 			leftHandData = new Array();
 			rightHandData = new Array();
+			skeletonData = new Array();
 			procChoice.resetToDefaultBackground();
 		}
 		
@@ -227,6 +233,14 @@ package ui.elements
 		
 		public function addRightHandData(val:int):void {
 			rightHandData.push(val);
+		}
+		
+		public function addSkeletonData(skeleton:Vector.<SkeletonJoint>):void {
+			var sk:Array = new Array();
+			for (var joint:SkeletonJoint in skeleton) {
+				sk.push([joint.position.rgb.x,joint.position.rgb.y]);
+			}
+			skeletonData.push(sk);
 		}
 	}
 }

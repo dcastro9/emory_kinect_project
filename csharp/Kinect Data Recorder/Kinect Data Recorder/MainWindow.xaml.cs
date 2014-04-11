@@ -389,6 +389,7 @@ namespace Kinect_Data_Recorder
 
         public MainWindow()
         {
+            
             InitializeComponent();
         }
     }

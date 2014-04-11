@@ -9,9 +9,9 @@
     Loaded="Window_Loaded"
     Closing="Window_Closing"        
     WindowState="Normal" 
-    mc:Ignorable="d" Width="1366" Height="768" Margin="0">
+    mc:Ignorable="d" Width="1376" Height="768" Margin="0" SizeToContent="WidthAndHeight">
 
-    <Grid x:Name="Body" Height="768" Width="1366" HorizontalAlignment="Left" VerticalAlignment="Top" Background="White">
+    <Grid x:Name="Body" Height="768" Width="1376" HorizontalAlignment="Left" VerticalAlignment="Top" Background="White">
         <Grid x:Name="Header" Height="54" Width="1366" HorizontalAlignment="Left" VerticalAlignment="Top" Background="#FF2D2D30">
             <Image x:Name="Emory_Logo" Source="Assets/Emory_Logo.png" Height="54" HorizontalAlignment="Left" VerticalAlignment="Top" />
             <Image x:Name="GT_Logo" Source="Assets/GT_Logo.png" Height="54" HorizontalAlignment="Right" VerticalAlignment="Top" />
@@ -19,7 +19,11 @@
         </Grid>
         <Grid x:Name="Patient_Form" Height="714" Width="510" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,54,0,0">
             <TextBlock x:Name="Form_Header" HorizontalAlignment="Center" TextWrapping="Wrap" Text="Patient Details" VerticalAlignment="Top" FontFamily="HelveNueThin" FontSize="56" Foreground="#FF5133AB" Margin="0,30,0,0"/>
+<<<<<<< HEAD
             <TextBlock x:Name="Form_Desc" HorizontalAlignment="Center" TextWrapping="Wrap" Text="Please fill out the details below to the best of your ability!" VerticalAlignment="Top" FontFamily="HelveNueThin" FontSize="32" Foreground="#FF2D2D30" Margin="45,100,10,0" Width="455"/>
+=======
+            <TextBlock x:Name="Form_Desc" HorizontalAlignment="Center" TextWrapping="Wrap" Text="Please fill out the details below to the best of your ability!" VerticalAlignment="Top" FontFamily="HelveNueThin" FontSize="32" Foreground="#FF2D2D30" Margin="45,100,23,0" Width="442"/>
+>>>>>>> 09e52cc26b4519282a746c9c8faa677d69feb396
             <TextBlock x:Name="Patient_ID_Label" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Patient ID" VerticalAlignment="Top" FontFamily="HelveNueThin" FontSize="32" Foreground="#FF5133AB" Margin="0,205,0,0" Padding="25,0,0,0" TextAlignment="Right" Width="190"/>
             <TextBlock x:Name="Procedure_Label" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Procedure" VerticalAlignment="Top" FontFamily="HelveNueThin" FontSize="32" Foreground="#FF5133AB" Margin="0,273,0,0" Padding="25,0,0,0" TextAlignment="Right" Width="190"/>
             <TextBlock x:Name="Details_Label" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Details" VerticalAlignment="Top" FontFamily="HelveNueThin" FontSize="32" Foreground="#FF5133AB" Margin="0,335,0,0" Padding="25,0,0,0" TextAlignment="Right" Width="190"/>

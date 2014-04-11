@@ -37,7 +37,7 @@ package
 		public static const FONT_MARKER:String;
 		
 		// Edit this to change where the patient data is saved.
-		public static const filePath:String = "C:/Users/kinectpc/Patient Data/";
+		public static const filePath:String = "A:/";
 		public static const webPath:String = "C:/web/";
 		
 		// General Kinect Settings
@@ -186,7 +186,7 @@ package
 				
 				settings = new KinectSettings();
 				settings.rgbEnabled = true;
-				settings.rgbResolution = CameraResolution.RESOLUTION_160_120;
+				settings.rgbResolution = CameraResolution.RESOLUTION_320_240;
 				settings.depthEnabled = true;
 				settings.depthResolution = CameraResolution.RESOLUTION_320_240;
 				settings.depthShowUserColors = false;
@@ -305,8 +305,6 @@ package
 			depthSkeletonContainer2.graphics.clear();
 			
 			for each(var user1:User in device1.users) {
-				
-				
 				if (user1.hasSkeleton) {
 					var leftShoulderPos:int = -1;
 					var rightShoulderPos:int = -1;
@@ -339,7 +337,7 @@ package
 						}
 						
 						depthSkeletonContainer1.graphics.beginFill(0xFF0000, joint1.positionConfidence);
-						depthSkeletonContainer1.graphics.drawCircle(joint1.position.rgb.x, joint1.position.rgb.y, 5);
+						depthSkeletonContainer1.graphics.drawCircle(joint1.position.rgb.x/1.5, joint1.position.rgb.y/1.5, 5);
 						depthSkeletonContainer1.graphics.endFill();
 					}
 				}
@@ -348,10 +346,9 @@ package
 				if (user2.hasSkeleton) {
 					for each(var joint2:SkeletonJoint in user2.skeletonJoints) {
 						depthSkeletonContainer2.graphics.beginFill(0xFF0000, joint2.positionConfidence);
-						depthSkeletonContainer2.graphics.drawCircle(joint2.position.rgb.x, joint2.position.rgb.y, 5);
+						depthSkeletonContainer2.graphics.drawCircle(joint2.position.rgb.x/2, joint2.position.rgb.y/2, 5);
 						depthSkeletonContainer2.graphics.endFill();
 					}
-					// View two.
 				}
 			}
 		}
