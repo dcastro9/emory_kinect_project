@@ -40,7 +40,7 @@ namespace Kinect_Data_Recorder
         private bool recordNextFrameForPosture;
         bool displayDepth;
 
-        Dictionary<string, KinectRecorder> recorders = new Dictionary<string,KinectRecorder>(2);
+        Dictionary<string, KinectRecorder> recorders = null;
         KinectReplay replay;
 
         private Skeleton[] skeletons;
@@ -178,7 +178,7 @@ namespace Kinect_Data_Recorder
                     return;
                 string id = ((KinectSensor)sender).DeviceConnectionId;
                 
-                if (recorders.Count > 1)
+                if (recorders != null)
                 {
                     KinectRecorder recorder = recorders[id];
                     if ((recorder.Options & KinectRecordOptions.Depth) != 0)
@@ -206,7 +206,7 @@ namespace Kinect_Data_Recorder
                     return;
                 string id = ((KinectSensor)sender).DeviceConnectionId;
                 
-                if (recorders.Count > 1)
+                if (recorders != null)
                 {
                     KinectRecorder recorder = recorders[id];
                     if ((recorder.Options & KinectRecordOptions.Color) != 0){
@@ -233,7 +233,7 @@ namespace Kinect_Data_Recorder
                     return;
                 string id = ((KinectSensor)sender).DeviceConnectionId;
                 
-                if (recorders.Count> 1)
+                if (recorders != null)
                 {
                     KinectRecorder recorder = recorders[id];
                     if ((recorder.Options & KinectRecordOptions.Skeletons) != 0){
@@ -305,13 +305,9 @@ namespace Kinect_Data_Recorder
         private void Clean(KinectSensor kinectSensor)
         {
             string id = kinectSensor.DeviceConnectionId;
-            if (recorders.Count == 2 ){
+            if (recorders != null){
                 KinectRecorder recorder = recorders[id];
-                if (recorder != null)
-                {
-                    recorder.Stop();
-                    recorder = null;
-                }
+                recorder.Stop();
             }
             if (kinectSensor != null)
             {
@@ -371,6 +367,9 @@ namespace Kinect_Data_Recorder
                 StopTimer();
                 return;
             }
+
+            recorders = new Dictionary<string, KinectRecorder>(2);
+
             SaveFileDialog saveFileDialog = new SaveFileDialog { Title = "Select filename", Filter = "Replay files|*.replay" };
              
             if (saveFileDialog.ShowDialog() == true)
@@ -394,16 +393,13 @@ namespace Kinect_Data_Recorder
 
         void StopRecord()
         {
-            if (recorders !=null)
+            if (recorders != null)
             {
-                string[] keys = recorders.Keys.ToArray();
-                for (int i = 0; i < recorders.Keys.Count;i++ )
+                foreach (KinectRecorder recorder in recorders.Values)
                 {
-                    string id = keys[i];
-                    recorders[id].Stop();
-                    recorders.Remove(id);
+                    recorder.Stop();
                 }
-
+                recorders = null;
                 return;
             }
         }
