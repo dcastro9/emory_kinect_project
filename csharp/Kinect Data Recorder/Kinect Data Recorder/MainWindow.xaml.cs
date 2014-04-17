@@ -369,17 +369,12 @@ namespace Kinect_Data_Recorder
             {
                 recorders = new Dictionary<string, KinectRecorder>(2);
 
-                SaveFileDialog saveFileDialog = new SaveFileDialog { Title = "Select filename", Filter = "Replay files|*.replay" };
-
-                if (saveFileDialog.ShowDialog() == true)
+                timerInit();
+                for (int i = 0; i < kinectSensors.Length; i++)
                 {
-                    timerInit();
-                    for (int i = 0; i < kinectSensors.Length; i++)
-                    {
-                        string file = saveFileDialog.FileName;
-                        string kinectID = kinectSensors[i].DeviceConnectionId;
-                        DirectRecord(file + "Kinect" + i.ToString(), kinectID);
-                    }
+                    string file = "Kinect " + i.ToString() + " - " + Patient_ID.Text + " - at " + DateTime.Now.ToString();
+                    string kinectID = kinectSensors[i].DeviceConnectionId;
+                    DirectRecord(file + ".replay", kinectID);
                 }
             }
 
