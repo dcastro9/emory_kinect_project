@@ -28,6 +28,7 @@ namespace Kinect_Data_Recorder
     public partial class MainWindow
     {
         private static string KINECT_SSD_PATH = "A:/Patients/";
+        private static string PROJECT_PATH = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "/";
         private KinectSensor[] kinectSensors = new KinectSensor[2];
         private Canvas[] canvases = new Canvas[2];
         private Dictionary<string, Image> displays = new Dictionary<string, Image>(2);
@@ -389,7 +390,7 @@ namespace Kinect_Data_Recorder
                 // may be better to create once and then continuously switch.
                 // However, I don't want to have too many global variables for random things,
                 // need to think about a better way of doing this.
-                Record_Button_Image.Source = new BitmapImage(new Uri("Assets/Recording_Button.jpg"));
+                Record_Button_Image.Source = new BitmapImage(new Uri(PROJECT_PATH + "Assets/Recording_Button.jpg"));
             }
 
             // Set recording to true.
@@ -400,7 +401,7 @@ namespace Kinect_Data_Recorder
             {
                 StopRecord();
                 StopTimer();
-                Record_Button_Image.Source = new BitmapImage(new Uri("Assets/Record_Button.jpg"));
+                Record_Button_Image.Source = new BitmapImage(new Uri(PROJECT_PATH + "Assets/Record_Button.jpg"));
                 return;
             }
         }
