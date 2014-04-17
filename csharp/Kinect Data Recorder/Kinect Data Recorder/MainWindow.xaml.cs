@@ -367,7 +367,8 @@ namespace Kinect_Data_Recorder
                 timerInit();
                 for (int i = 0; i < kinectSensors.Length; i++)
                 {
-                    string file = KINECT_SSD_PATH + "Kinect " + i.ToString() + " - " + Patient_ID.Text + " - at " + DateTime.Now.ToString().Replace('/','-');
+                    string parsedDate = DateTime.Now.ToString().Replace('/', '-').Replace(':', '-');
+                    string file = KINECT_SSD_PATH + "Kinect ID - " + i.ToString() + " - " + Patient_ID.Text + " - at " + parsedDate;
                     string kinectID = kinectSensors[i].DeviceConnectionId;
                     DirectRecord(file + ".replay", kinectID);
                 }
