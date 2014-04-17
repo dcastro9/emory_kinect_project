@@ -30,7 +30,7 @@ namespace Kinect_Data_Recorder
         private static string KINECT_SSD_PATH = "A:/Patients/";
         private static string PROJECT_PATH = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName + "/";
         private KinectSensor[] kinectSensors = new KinectSensor[2];
-        private Canvas[] canvases = new Canvas[2];
+        private Dictionary<string, Canvas> canvases = new Dictionary<string, Canvas>(2);
         private Dictionary<string, Image> displays = new Dictionary<string, Image>(2);
         private Dictionary<string, ColorStreamManager> colorManagers = new Dictionary<string, ColorStreamManager>(2);
         private Dictionary<string, DepthStreamManager> depthManagers = new Dictionary<string, DepthStreamManager>(2);
@@ -94,7 +94,7 @@ namespace Kinect_Data_Recorder
                         {
                             kinectSensors[0] = kinect;
                             string id = kinect.DeviceConnectionId;
-                            canvases[0] = kinectCanvas1;
+                            canvases.Add(id, kinectCanvas1);
                             displays.Add(id, kinectDisplay1);
                             colorManagers.Add(id, new ColorStreamManager());
                             depthManagers.Add(id, new DepthStreamManager());
@@ -103,7 +103,7 @@ namespace Kinect_Data_Recorder
                         {
                             kinectSensors[1] = kinect;
                             string id = kinect.DeviceConnectionId;
-                            canvases[1] = kinectCanvas2;
+                            canvases.Add(id, kinectCanvas2);
                             displays.Add(id, kinectDisplay2);
                             colorManagers.Add(id, new ColorStreamManager());
                             depthManagers.Add(id, new DepthStreamManager());
@@ -156,7 +156,7 @@ namespace Kinect_Data_Recorder
                 kinectSensors[i].SkeletonFrameReady += kinectRuntime_SkeletonFrameReady;
 
                 string id = kinectSensors[i].DeviceConnectionId;
-                skeletonDisplayManagers[id] = new SkeletonDisplayManager(kinectSensors[i], canvases[i]);
+                skeletonDisplayManagers[id] = new SkeletonDisplayManager(kinectSensors[i], canvases[id]);
 
                 kinectSensors[i].Start();
 
@@ -243,7 +243,10 @@ namespace Kinect_Data_Recorder
                 frame.GetSkeletons(ref skeletons);
 
                 if (skeletons.All(s => s.TrackingState == SkeletonTrackingState.NotTracked))
+                {
+                    canvases[((KinectSensor)sender).DeviceConnectionId].Children.Clear();
                     return;
+                }
 
                 ProcessFrame(frame, sender);
             }
