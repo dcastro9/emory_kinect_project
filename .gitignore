@@ -10,3 +10,8 @@ bin-release/
 # should NOT be excluded as they contain compiler settings and other important
 # information for Eclipse / Flash Builder.
 *.cache
+csharp/Kinect Data Recorder/Kinect Data Recorder/obj/Debug/App.g.i.cs
+csharp/Kinect Data Recorder/Kinect Data Recorder/obj/Debug/Kinect Data Recorder.exe
+csharp/Kinect Data Recorder/Kinect Data Recorder/obj/Debug/Kinect Data Recorder.pdb
+csharp/Kinect Data Recorder/Kinect Data Recorder/obj/Debug/Kinect Data Recorder_MarkupCompile.cache
+csharp/Kinect Data Recorder/Kinect Data Recorder/obj/Debug/MainWindow.g.i.cs
