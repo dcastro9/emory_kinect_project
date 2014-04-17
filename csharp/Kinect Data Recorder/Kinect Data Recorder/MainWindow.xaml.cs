@@ -27,24 +27,19 @@ namespace Kinect_Data_Recorder
     /// </summary>
     public partial class MainWindow
     {
-        KinectSensor[] kinectSensors = new KinectSensor[2];
-        Canvas[] canvases = new Canvas[2];
-        Dictionary<string, Image> displays = new Dictionary<string, Image>(2);
-
-        Dictionary<string, ColorStreamManager> colorManagers = new Dictionary<string, ColorStreamManager>(2);
-        Dictionary<string, DepthStreamManager> depthManagers = new Dictionary<string, DepthStreamManager>(2);
-        Dictionary<string, SkeletonDisplayManager> skeletonDisplayManagers = new Dictionary<string, SkeletonDisplayManager>(2);
-
+        private static string KINECT_SSD_PATH = "A:/";
+        private KinectSensor[] kinectSensors = new KinectSensor[2];
+        private Canvas[] canvases = new Canvas[2];
+        private Dictionary<string, Image> displays = new Dictionary<string, Image>(2);
+        private Dictionary<string, ColorStreamManager> colorManagers = new Dictionary<string, ColorStreamManager>(2);
+        private Dictionary<string, DepthStreamManager> depthManagers = new Dictionary<string, DepthStreamManager>(2);
+        private Dictionary<string, SkeletonDisplayManager> skeletonDisplayManagers = new Dictionary<string, SkeletonDisplayManager>(2);
+        private Dictionary<string, KinectRecorder> recorders = null;
         readonly ContextTracker contextTracker = new ContextTracker();
-
         private bool recordNextFrameForPosture;
-        bool displayDepth;
-
+        private bool displayDepth;
         private bool recording = false;
-
-        Dictionary<string, KinectRecorder> recorders = null;
-        KinectReplay replay;
-
+        private KinectReplay replay;
         private Skeleton[] skeletons;
 
         void Kinects_StatusChanged(object sender, StatusChangedEventArgs e)
@@ -372,7 +367,7 @@ namespace Kinect_Data_Recorder
                 timerInit();
                 for (int i = 0; i < kinectSensors.Length; i++)
                 {
-                    string file = "Kinect " + i.ToString() + " - " + Patient_ID.Text + " - at " + DateTime.Now.ToString();
+                    string file = KINECT_SSD_PATH + "Kinect " + i.ToString() + " - " + Patient_ID.Text + " - at " + DateTime.Now.ToString().Replace('/','-');
                     string kinectID = kinectSensors[i].DeviceConnectionId;
                     DirectRecord(file + ".replay", kinectID);
                 }
