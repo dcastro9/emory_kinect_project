@@ -362,15 +362,10 @@ namespace Kinect_Data_Recorder
         
         private void recordOption_Click(object sender, RoutedEventArgs e)
         {
-            recording = !recording;
-
+            // We create the recorders prior to setting 'recording' to true, so that when
+            // we set recording to true, we are certain the recorders have been created.
+            // If !recording means that you want to initialize recording.
             if (!recording)
-            {
-                StopRecord();
-                StopTimer();
-                return;
-            }
-            else
             {
                 recorders = new Dictionary<string, KinectRecorder>(2);
 
@@ -388,7 +383,16 @@ namespace Kinect_Data_Recorder
                 }
             }
 
-            
+            // Set recording to true.
+            recording = !recording;
+
+            // End recording.
+            if (!recording)
+            {
+                StopRecord();
+                StopTimer();
+                return;
+            }
         }
 
         void DirectRecord(string targetFileName, string id)
