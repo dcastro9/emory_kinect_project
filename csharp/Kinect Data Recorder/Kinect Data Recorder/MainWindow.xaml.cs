@@ -27,7 +27,7 @@ namespace Kinect_Data_Recorder
     /// </summary>
     public partial class MainWindow
     {
-        private static string KINECT_SSD_PATH = "A:/";
+        private static string KINECT_SSD_PATH = "A:/Patients/";
         private KinectSensor[] kinectSensors = new KinectSensor[2];
         private Canvas[] canvases = new Canvas[2];
         private Dictionary<string, Image> displays = new Dictionary<string, Image>(2);
@@ -364,14 +364,27 @@ namespace Kinect_Data_Recorder
             {
                 recorders = new Dictionary<string, KinectRecorder>(2);
 
-                timerInit();
+                string subFolder = "";
+                if (Patient_ID.Text == "")
+                {
+                    subFolder = "no_id/";
+                }
+                else {
+                    subFolder = Patient_ID.Text + "/";
+                }
+
+                // Makes sure the directory exists (if it already does, it doesn't raise an error).
+                System.IO.Directory.CreateDirectory(KINECT_SSD_PATH + subFolder);
+                
                 for (int i = 0; i < kinectSensors.Length; i++)
                 {
                     string parsedDate = DateTime.Now.ToString().Replace('/', '-').Replace(':', '-');
-                    string file = KINECT_SSD_PATH + "Kinect ID - " + i.ToString() + " - " + Patient_ID.Text + " - at " + parsedDate;
+                    string file = KINECT_SSD_PATH + subFolder + "Kinect " + i.ToString() + " - on " + parsedDate;
                     string kinectID = kinectSensors[i].DeviceConnectionId;
                     DirectRecord(file + ".replay", kinectID);
                 }
+
+                timerInit();
             }
 
             // Set recording to true.
@@ -388,6 +401,7 @@ namespace Kinect_Data_Recorder
 
         void DirectRecord(string targetFileName, string id)
         {
+            File.Create()
             Stream recordStream = File.Create(targetFileName);
             recorders.Add(id, new KinectRecorder(KinectRecordOptions.Skeletons | KinectRecordOptions.Depth, recordStream));
         }
