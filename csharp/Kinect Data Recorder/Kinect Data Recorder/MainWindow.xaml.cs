@@ -401,7 +401,6 @@ namespace Kinect_Data_Recorder
 
         void DirectRecord(string targetFileName, string id)
         {
-            File.Create()
             Stream recordStream = File.Create(targetFileName);
             recorders.Add(id, new KinectRecorder(KinectRecordOptions.Skeletons | KinectRecordOptions.Depth, recordStream));
         }
