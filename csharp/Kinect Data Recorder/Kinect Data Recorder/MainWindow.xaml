@@ -27,7 +27,7 @@
             <TextBox x:Name="Procedure" HorizontalAlignment="Left" Margin="215,263,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Background="#FFDDDDDD" Width="290" Height="58" FontSize="24" FontFamily="HelveNueThin" Padding="20,12,20,10"/>
             <TextBox x:Name="Details" HorizontalAlignment="Left" Margin="215,332,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Background="#FFDDDDDD" Width="290" Height="190" FontSize="21.333" FontFamily="HelveNueThin" Padding="20,12,20,10" AcceptsReturn="True"/>
             <Button x:Name="Record_Button" Click ="recordOption_Click" Width="250" Height="65" BorderBrush="{x:Null}" BorderThickness="0" Padding="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,5,90">
-                <Image Source="Assets/record_button.jpg" Width="250" Height="65"></Image>
+                <Image x:Name="Record_Button_Image" Source="Assets/Record_Button.jpg" Width="250" Height="65"></Image>
             </Button>
             <TextBlock x:Name="TimerLabel" HorizontalAlignment="Right" Margin="0,629,0,0" TextWrapping="Wrap" Text="00:00" VerticalAlignment="Top" Height="57" Width="90" FontSize="35"/>
         </Grid>

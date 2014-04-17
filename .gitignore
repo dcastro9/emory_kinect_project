@@ -15,3 +15,4 @@ csharp/Kinect Data Recorder/Kinect Data Recorder/obj/Debug/Kinect Data Recorder.
 csharp/Kinect Data Recorder/Kinect Data Recorder/obj/Debug/Kinect Data Recorder.pdb
 csharp/Kinect Data Recorder/Kinect Data Recorder/obj/Debug/Kinect Data Recorder_MarkupCompile.cache
 csharp/Kinect Data Recorder/Kinect Data Recorder/obj/Debug/MainWindow.g.i.cs
+*.cache

@@ -385,6 +385,11 @@ namespace Kinect_Data_Recorder
                 }
 
                 timerInit();
+                // TODO(dcastro): Creating a new bitmap image every time is a bit excessive,
+                // may be better to create once and then continuously switch.
+                // However, I don't want to have too many global variables for random things,
+                // need to think about a better way of doing this.
+                Record_Button_Image.Source = new BitmapImage(new Uri("Assets/Recording_Button.jpg"));
             }
 
             // Set recording to true.
@@ -395,6 +400,7 @@ namespace Kinect_Data_Recorder
             {
                 StopRecord();
                 StopTimer();
+                Record_Button_Image.Source = new BitmapImage(new Uri("Assets/Record_Button.jpg"));
                 return;
             }
         }
