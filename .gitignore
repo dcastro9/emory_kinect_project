@@ -200,3 +200,4 @@ csharp/Kinect Data Recorder/Kinect Data Recorder/obj/Debug/Kinect Data Recorder_
 csharp/Kinect Data Recorder/Kinect Data Recorder/obj/Debug/MainWindow.baml
 csharp/Kinect Data Recorder/Kinect Data Recorder/obj/Debug/MainWindow.g.cs
 csharp/Kinect Data Recorder/Kinect Data Recorder/obj/Debug/MainWindow.g.i.cs
+*.suo
